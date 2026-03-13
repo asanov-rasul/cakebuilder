@@ -1,0 +1,37 @@
+.wrap { display: flex; flex-direction: column; gap: 20px; }
+
+.summaryCard, .formCard {
+  background: var(--white);
+  border: 1px solid var(--gray-100);
+  border-radius: var(--radius-xl);
+  padding: 28px;
+  box-shadow: var(--shadow);
+}
+
+.summaryTitle, .formTitle {
+  font-size: 18px; font-weight: 400; color: var(--chocolate);
+  margin-bottom: 18px; font-family: var(--font-display);
+}
+
+.summaryGrid { display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px; }
+.summaryRow { display: flex; justify-content: space-between; font-size: 14px; }
+.summaryLabel { color: var(--gray-400); }
+.summaryValue { color: var(--chocolate); font-weight: 500; max-width: 240px; text-align: right; }
+.summaryTotal {
+  display: flex; justify-content: space-between; align-items: center;
+  padding-top: 14px; border-top: 1px solid var(--gray-100);
+  font-size: 15px; font-weight: 500; color: var(--gray-600);
+}
+.summaryTotalPrice {
+  font-family: var(--font-display); font-size: 28px; color: var(--chocolate); font-weight: 400;
+}
+
+.form { display: flex; flex-direction: column; gap: 16px; }
+.formRow { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+@media (max-width: 520px) { .formRow { grid-template-columns: 1fr; } }
+
+.formFooter {
+  display: flex; justify-content: space-between; align-items: center;
+  margin-top: 8px; gap: 12px;
+}
+@media (max-width: 480px) { .formFooter { flex-direction: column; } .formFooter .btn { width: 100%; } }

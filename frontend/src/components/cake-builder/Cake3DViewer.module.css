@@ -1,0 +1,53 @@
+.viewer {
+  position: relative;
+  width: 100%;
+  height: 340px;
+  border-radius: var(--radius-xl);
+  overflow: hidden;
+  background: radial-gradient(ellipse at 40% 30%, #fff8f0 0%, #fdf0e8 40%, #f5e6d8 100%);
+  box-shadow:
+    0 2px 8px rgba(45,27,14,0.08),
+    inset 0 0 60px rgba(232,97,74,0.04);
+  cursor: grab;
+  user-select: none;
+}
+.viewer:active { cursor: grabbing; }
+
+.canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+  outline: none;
+}
+
+.hint {
+  position: absolute;
+  bottom: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 11px;
+  color: rgba(93,60,30,0.4);
+  font-weight: 500;
+  letter-spacing: 0.3px;
+  pointer-events: none;
+  white-space: nowrap;
+}
+
+/* Label at top */
+.viewer::before {
+  content: '3D Preview';
+  position: absolute;
+  top: 12px;
+  left: 16px;
+  font-size: 11px;
+  font-weight: 600;
+  color: rgba(93,60,30,0.4);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  pointer-events: none;
+  z-index: 2;
+}
+
+@media (max-width: 768px) {
+  .viewer { height: 260px; }
+}

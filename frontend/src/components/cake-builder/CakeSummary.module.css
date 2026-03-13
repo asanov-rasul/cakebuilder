@@ -1,0 +1,31 @@
+.summary {
+  background: var(--cream-100);
+  border: 1px solid var(--gray-100);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+}
+.header {
+  display: flex; align-items: center; gap: 8px;
+  padding: 14px 18px;
+  background: var(--white);
+  border-bottom: 1px solid var(--gray-100);
+  font-size: 13px; font-weight: 600; color: var(--chocolate);
+}
+.rows { padding: 12px 18px; display: flex; flex-direction: column; gap: 8px; }
+.row {
+  display: flex; align-items: flex-start; gap: 8px;
+  font-size: 13px;
+}
+.rowEmoji { width: 18px; flex-shrink: 0; font-size: 14px; }
+.rowLabel { color: var(--gray-400); min-width: 80px; flex-shrink: 0; }
+.rowValue { color: var(--chocolate); font-weight: 500; }
+.total {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 14px 18px;
+  border-top: 1px solid var(--gray-200);
+  font-size: 14px; font-weight: 500; color: var(--gray-600);
+}
+.totalPrice {
+  font-family: var(--font-display);
+  font-size: 22px; font-weight: 400; color: var(--chocolate);
+}
