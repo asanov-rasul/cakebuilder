@@ -112,7 +112,7 @@ function OrderDetailModal({ order, onClose, onStatusChange }) {
 
           <div className={styles.modalTotal}>
             <span>{t.common.total}</span>
-            <span className={styles.modalPrice}>${parseFloat(order.total_price).toFixed(2)}</span>
+            <span className={styles.modalPrice}>{parseFloat(order.total_price).toFixed(2)} TMT</span>
           </div>
         </div>
 
@@ -267,7 +267,7 @@ export default function DashOrders() {
                       {order.cake_text && <div className={styles.cakeText}>"{order.cake_text}"</div>}
                     </td>
                     <td className={styles.hideSmall}>{fmtDateShort(order.delivery_date)}</td>
-                    <td className={styles.priceCell}>${parseFloat(order.total_price).toFixed(2)}</td>
+                    <td className={styles.priceCell}>{parseFloat(order.total_price).toFixed(2)} TMT</td>
                     <td><span className={`badge badge-${order.status}`}>{STATUS_LABELS[order.status]}</span></td>
                     <td><span className={styles.viewBtn}>{OR.view}</span></td>
                   </tr>

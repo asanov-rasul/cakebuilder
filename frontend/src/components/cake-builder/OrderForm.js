@@ -67,7 +67,7 @@ export default function OrderForm({ shopId, shopName, onOrderPlaced, onBack }) {
         </div>
         <div className={styles.summaryTotal}>
           <span>{O.totalPrice}</span>
-          <span className={styles.summaryTotalPrice}>${price.toFixed(2)}</span>
+          <span className={styles.summaryTotalPrice}>{price.toFixed(2)} TMT</span>
         </div>
       </div>
 
@@ -113,7 +113,7 @@ export default function OrderForm({ shopId, shopName, onOrderPlaced, onBack }) {
               {O.editCake}
             </button>
             <button type="submit" className="btn btn-primary btn-lg" disabled={loading}>
-              {loading ? <span className="spinner" /> : `${O.placeOrder} · $${price.toFixed(2)}`}
+              {loading ? <span className="spinner" /> : `${O.placeOrder} · ${\1} TMT TMT`}
             </button>
           </div>
         </form>

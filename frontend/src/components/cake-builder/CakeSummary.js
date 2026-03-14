@@ -37,7 +37,7 @@ export default function CakeSummary() {
       </div>
       <div className={styles.total}>
         <span>{t.common.total}</span>
-        <span className={styles.totalPrice}>${price.toFixed(2)}</span>
+        <span className={styles.totalPrice}>{price.toFixed(2)} TMT</span>
       </div>
     </div>
   );

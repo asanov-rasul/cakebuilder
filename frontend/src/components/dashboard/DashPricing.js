@@ -62,7 +62,7 @@ export default function DashPricing() {
         <p className={styles.cardDesc}>{P.basePriceDesc}</p>
         <div className={styles.basePriceRow}>
           <div className={styles.priceInputWrap}>
-            <span className={styles.dollarSign}>$</span>
+            <span className={styles.dollarSign}>TMT</span>
             <input
               className={`form-input ${styles.priceInput}`}
               type="number" min="1" step="0.5"

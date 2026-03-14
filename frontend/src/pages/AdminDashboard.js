@@ -73,7 +73,7 @@ function AdminOverview() {
           { icon: '🏪', num: stats.total_shops,  sub: `${stats.active_shops} ${OV.active}`, label: OV.totalShops },
           { icon: '📦', num: stats.total_orders,  label: OV.totalOrders },
           { icon: '👥', num: stats.total_users,   label: OV.totalUsers },
-          { icon: '💰', num: `$${parseFloat(stats.platform_revenue || 0).toFixed(0)}`, label: OV.revenue },
+          { icon: '💰', num: `${parseFloat(stats.platform_revenue || 0).toFixed(0)}`, label: OV.revenue },
         ].map(s => (
           <div key={s.label} className={styles.statCard}>
             <div className={styles.statIcon}>{s.icon}</div>
@@ -166,7 +166,7 @@ function AdminOrders() {
                 <td>{o.shop_name}</td>
                 <td><div>{o.customer_name}</div><div className={styles.shopSlug}>{o.customer_phone}</div></td>
                 <td>{[o.cake_shape, o.cake_size_kg && `${o.cake_size_kg}kg`].filter(Boolean).join(', ')}</td>
-                <td>${parseFloat(o.total_price).toFixed(2)}</td>
+                <td>{parseFloat(o.total_price).toFixed(2)} TMT</td>
                 <td><span className={`badge badge-${o.status}`}>{STATUS_LABELS[o.status] || o.status}</span></td>
               </tr>
             ))}

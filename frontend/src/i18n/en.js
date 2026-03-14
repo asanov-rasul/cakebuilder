@@ -261,7 +261,7 @@ const en = {
       sub: 'Set your base price and per-item modifiers',
       basePriceTitle: 'Base price per kg',
       basePriceDesc: 'This is the starting price for a 1kg cake. All sizes multiply from this value.',
-      basePricePer: '$ per kg',
+      basePricePer: 'TMT / кг',
       saveBase: 'Save base price',
       invalidPrice: 'Enter a valid price',
       saveSuccess: 'Base price saved!',

@@ -64,7 +64,7 @@ function MenuSection({ sectionKey, label, icon, addLabel, items, onAdd, onToggle
           <input className="form-input" required placeholder={M.namePlaceholder}
             value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} />
           <div className={styles.priceInputWrap}>
-            <span className={styles.dollarSign}>$</span>
+            <span className={styles.dollarSign}>TMT</span>
             <input className={`form-input ${styles.priceInput}`} type="number" min="0" step="0.5"
               placeholder={M.pricePlaceholder}
               value={form[priceField]}
@@ -85,7 +85,7 @@ function MenuSection({ sectionKey, label, icon, addLabel, items, onAdd, onToggle
                 <input className="form-input" value={editForm.name || ''}
                   onChange={e => setEditForm({ ...editForm, name: e.target.value })} />
                 <div className={styles.priceInputWrap}>
-                  <span className={styles.dollarSign}>$</span>
+                  <span className={styles.dollarSign}>TMT</span>
                   <input className={`form-input ${styles.priceInput}`} type="number" min="0" step="0.5"
                     value={editForm[priceField] || 0}
                     onChange={e => setEditForm({ ...editForm, [priceField]: e.target.value })} />

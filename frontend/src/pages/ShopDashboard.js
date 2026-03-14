@@ -66,21 +66,29 @@ export default function ShopDashboard() {
         <div className={styles.sidebarFooter}>
           {shop && (
             <a href={`/shop/${shop.slug}`} target="_blank" rel="noopener noreferrer" className={styles.viewShopBtn}>
-              {t.common.viewShop}
+              🔗 {t.common.viewShop}
             </a>
           )}
-          <LangSwitcher />
+          <div style={{ padding: '6px 0' }}>
+            <LangSwitcher />
+          </div>
           <button className={styles.logoutBtn} onClick={handleLogout}>
-            {t.common.signOut}
+            🚪 {t.nav.logout}
           </button>
         </div>
       </aside>
 
-      <div className={styles.content}>
+      <div className={styles.main}>
         <header className={styles.topbar}>
-          <button className={styles.menuBtn} onClick={() => setSidebarOpen(true)}>☰</button>
+          <button className={styles.menuBtn} onClick={() => setSidebarOpen(!sidebarOpen)}>☰</button>
+          <div className={styles.topbarRight}>
+            <div className={styles.userInfo}>
+              <div className={styles.userAvatar}>{user?.full_name?.[0] || 'U'}</div>
+              <span className={styles.userName}>{user?.full_name}</span>
+            </div>
+          </div>
         </header>
-        <main className={styles.main}>
+        <div className={styles.content}>
           <Routes>
             <Route index element={<Navigate to="overview" replace />} />
             <Route path="overview" element={<DashOverview />} />
@@ -89,7 +97,7 @@ export default function ShopDashboard() {
             <Route path="pricing"  element={<DashPricing />} />
             <Route path="profile"  element={<DashProfile />} />
           </Routes>
-        </main>
+        </div>
       </div>
     </div>
   );

@@ -60,7 +60,7 @@ export default function CakeBuilder({ config }) {
           <Cake3DViewer />
           <div className={styles.priceTag}>
             <span className={styles.priceTagLabel}>{B.yourCake}</span>
-            <span className={styles.priceTagValue}>${price.toFixed(2)}</span>
+            <span className={styles.priceTagValue}>{price.toFixed(2)} TMT</span>
           </div>
         </div>
 

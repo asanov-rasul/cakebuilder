@@ -31,7 +31,7 @@ export function StepShape({ shapes }) {
           key={s.id}
           emoji={shapeEmojis[s.slug] || '🔵'}
           label={s.name}
-          sublabel={parseFloat(s.price_modifier) > 0 ? `+$${s.price_modifier}` : t.builder.included}
+          sublabel={parseFloat(s.price_modifier) > 0 ? `+${s.price_modifier} TMT` : t.builder.included}
           selected={shape?.id === s.id}
           onClick={() => setShape(s)}
         />
@@ -56,7 +56,7 @@ export function StepSize({ sizes, pricePerKg }) {
               key={s.id}
               emoji={s.weight_kg <= 1 ? '🍰' : s.weight_kg <= 2 ? '🎂' : '🎆'}
               label={`${s.weight_kg} kg`}
-              sublabel={`${t.builder.from} $${price}`}
+              sublabel={`${t.builder.from} ${price} TMT`}
               selected={size?.id === s.id}
               onClick={() => setSize(s)}
               badge={s.weight_kg === 2 ? t.builder.popular : null}
@@ -80,7 +80,7 @@ export function StepFilling({ fillings }) {
           key={f.id}
           emoji={fillingEmojis[f.name] || '🎂'}
           label={f.name}
-          sublabel={parseFloat(f.price_modifier) > 0 ? `+$${f.price_modifier}` : t.builder.included}
+          sublabel={parseFloat(f.price_modifier) > 0 ? `+${f.price_modifier} TMT` : t.builder.included}
           selected={filling?.id === f.id}
           onClick={() => setFilling(f)}
         />
@@ -101,7 +101,7 @@ export function StepCream({ creams }) {
           key={c.id}
           emoji={creamEmojis[c.name] || '🧁'}
           label={c.name}
-          sublabel={parseFloat(c.price_modifier) > 0 ? `+$${c.price_modifier}` : t.builder.included}
+          sublabel={parseFloat(c.price_modifier) > 0 ? `+${c.price_modifier} TMT` : t.builder.included}
           selected={cream?.id === c.id}
           onClick={() => setCream(c)}
         />
@@ -126,7 +126,7 @@ export function StepDecorations({ decorations }) {
               key={d.id}
               emoji={decorEmojis[d.name] || '✨'}
               label={d.name}
-              sublabel={`+$${parseFloat(d.price).toFixed(2)}`}
+              sublabel={`+${parseFloat(d.price).toFixed(2)} TMT`}
               selected={isSelected}
               onClick={() => toggleDecoration(d)}
             />

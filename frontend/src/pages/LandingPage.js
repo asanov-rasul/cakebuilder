@@ -90,7 +90,7 @@ export default function LandingPage() {
                 </div>
                 <div className={styles.previewPrice}>
                   <span>{L.total}</span>
-                  <strong>$47.50</strong>
+                  <strong>47.50 TMT</strong>
                 </div>
               </div>
             </div>

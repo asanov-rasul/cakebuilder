@@ -261,7 +261,7 @@ const tk = {
       sub: 'Esasy bahany we goşmaçalary sazlaň',
       basePriceTitle: 'Kg başyna esasy baha',
       basePriceDesc: '1 kg tort üçin başlangyç baha. Ähli ölçegler şu bahadan köpeldilýär.',
-      basePricePer: '$ / kg',
+      basePricePer: 'TMT / kg',
       saveBase: 'Esasy bahany sakla',
       invalidPrice: 'Dogry baha giriziň',
       saveSuccess: 'Esasy baha saklady!',

@@ -61,8 +61,8 @@ export default function DashOverview() {
         {[
           { icon: '📦', num: stats?.total_orders ?? 0,                      label: OV.totalOrders },
           { icon: '🔔', num: stats?.status_breakdown?.find(s => s.status === 'new')?.count ?? 0, label: OV.newOrders },
-          { icon: '💰', num: `$${(stats?.total_revenue ?? 0).toFixed(0)}`,  label: OV.totalRevenue },
-          { icon: '📈', num: `$${(stats?.revenue_last_30 ?? 0).toFixed(0)}`,label: OV.last30 },
+          { icon: '💰', num: `${(stats?.total_revenue ?? 0).toFixed(0)}`,  label: OV.totalRevenue },
+          { icon: '📈', num: `${(stats?.revenue_last_30 ?? 0).toFixed(0)}`,label: OV.last30 },
         ].map(s => (
           <div key={s.label} className={styles.statCard}>
             <div className={styles.statIcon}>{s.icon}</div>
@@ -106,7 +106,7 @@ export default function DashOverview() {
                   <span className={`badge badge-${order.status}`}>
                     {STATUS_COLORS[order.status]?.label || order.status}
                   </span>
-                  <span className={styles.orderPrice}>${parseFloat(order.total_price).toFixed(2)}</span>
+                  <span className={styles.orderPrice}>{parseFloat(order.total_price).toFixed(2)} TMT</span>
                 </div>
               </div>
             ))}
