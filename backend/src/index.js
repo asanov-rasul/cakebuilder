@@ -7,8 +7,8 @@ const app = express();
 // Middleware
 app.use(cors({
   origin: [
+    'https://cakebuilder-beige.vercel.app',
     'http://localhost:3000',
-    'https://твой-проект.vercel.app',
   ],
   credentials: true,
 }));
