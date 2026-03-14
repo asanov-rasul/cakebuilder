@@ -4,6 +4,7 @@ import { shopAPI } from '../utils/api';
 import useCakeStore from '../store/cakeStore';
 import CakeBuilder from '../components/cake-builder/CakeBuilder';
 import OrderForm from '../components/cake-builder/OrderForm';
+import { useLang, LangSwitcher } from '../i18n';
 import styles from './ShopPage.module.css';
 
 const BUILDER_STEPS = 6;
@@ -15,6 +16,8 @@ export default function ShopPage() {
   const [error, setError] = useState(null);
   const [orderComplete, setOrderComplete] = useState(null);
   const { setShopConfig, reset, step } = useCakeStore();
+  const { t } = useLang();
+  const S = t.shop;
 
   useEffect(() => {
     loadShop();
@@ -27,22 +30,20 @@ export default function ShopPage() {
       setConfig(res.data);
       setShopConfig(res.data);
     } catch (err) {
-      setError(err.response?.data?.error || 'Shop not found');
+      setError(err.response?.data?.error || S.notFound);
     } finally {
       setLoading(false);
     }
   };
 
   const isOrderForm = step > BUILDER_STEPS;
-
-  // Progress: during builder show step/6, during order form show full
   const progressPct = isOrderForm ? 100 : (step / BUILDER_STEPS) * 100;
-  const progressLabel = isOrderForm ? 'Almost done!' : `Step ${step} of ${BUILDER_STEPS}`;
+  const progressLabel = isOrderForm ? S.almostDone : `${S.step} ${step} ${S.of} ${BUILDER_STEPS}`;
 
   if (loading) return (
     <div className={styles.loading}>
       <div className="spinner" style={{ width: 32, height: 32 }} />
-      <p>Loading shop...</p>
+      <p>{S.loading}</p>
     </div>
   );
 
@@ -50,9 +51,9 @@ export default function ShopPage() {
     <div className={styles.errorPage}>
       <div className={styles.errorBox}>
         <div className={styles.errorEmoji}>🍰</div>
-        <h2>Shop not found</h2>
+        <h2>{S.notFound}</h2>
         <p>{error}</p>
-        <a href="/" className="btn btn-primary mt-4">Back to home</a>
+        <a href="/" className="btn btn-primary mt-4">{S.backHome}</a>
       </div>
     </div>
   );
@@ -61,14 +62,14 @@ export default function ShopPage() {
     <div className={styles.successPage}>
       <div className={styles.successBox}>
         <div className={styles.successEmoji}>🎉</div>
-        <h2>Order placed!</h2>
-        <p>Your order <strong>#{orderComplete.order_number}</strong> has been received by <strong>{config.shop.name}</strong>.</p>
+        <h2>{S.orderSuccess}</h2>
+        <p>{S.orderSuccessDesc} <strong>#{orderComplete.order_number}</strong> {S.orderSuccessDesc2} <strong>{config.shop.name}</strong>.</p>
         <p style={{ fontSize: 14, color: 'var(--gray-400)', marginTop: 8 }}>
-          They will contact you at <strong>{orderComplete.customer_phone}</strong> to confirm.
+          {S.orderSuccessContact} <strong>{orderComplete.customer_phone}</strong> {S.orderSuccessContact2}
         </p>
         <button className="btn btn-primary btn-lg" style={{ marginTop: 24 }}
           onClick={() => { setOrderComplete(null); reset(); }}>
-          Order another cake
+          {S.orderAnother}
         </button>
       </div>
     </div>
@@ -76,45 +77,26 @@ export default function ShopPage() {
 
   return (
     <div className={styles.page}>
-      {/* Shop header */}
       <header className={styles.header}>
         <div className={styles.headerInner}>
-          <div className={styles.shopInfo}>
-            <div className={styles.shopAvatar}>{config.shop.name[0]}</div>
+          <div className={styles.shopBrand}>
+            <div className={styles.shopAvatar}>{config.shop.name?.[0]}</div>
             <div>
-              <h1 className={styles.shopName}>{config.shop.name}</h1>
-              {config.shop.city && <p className={styles.shopCity}>📍 {config.shop.city}</p>}
+              <div className={styles.shopName}>{config.shop.name}</div>
+              {config.shop.city && <div className={styles.shopCity}>{config.shop.city}</div>}
             </div>
           </div>
-          <div className={styles.headerRight}>
-            {config.shop.phone && (
-              <a href={`tel:${config.shop.phone}`} className={styles.shopPhone}>
-                📞 {config.shop.phone}
-              </a>
-            )}
-          </div>
+          <LangSwitcher />
         </div>
+        <div className={styles.progressWrap}>
+          <div className={styles.progressBar} style={{ width: `${progressPct}%` }} />
+        </div>
+        <div className={styles.progressLabel}>{progressLabel}</div>
       </header>
 
-      {/* Progress bar */}
-      <div className={styles.progressWrap}>
-        <div className={styles.progressInner}>
-          <div className={styles.progressBar}>
-            <div className={styles.progressFill} style={{ width: `${progressPct}%` }} />
-          </div>
-          <span className={styles.progressLabel}>{progressLabel}</span>
-        </div>
-      </div>
-
-      {/* Main content */}
       <main className={styles.main}>
         {isOrderForm
-          ? <OrderForm
-              shopId={config.shop.id}
-              shopName={config.shop.name}
-              onOrderPlaced={setOrderComplete}
-              onBack={() => useCakeStore.getState().prevStep()}
-            />
+          ? <OrderForm shopId={config.shop.id} shopName={config.shop.name} onOrderPlaced={setOrderComplete} onBack={() => useCakeStore.getState().prevStep()} />
           : <CakeBuilder config={config} />
         }
       </main>

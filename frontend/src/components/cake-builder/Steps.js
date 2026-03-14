@@ -1,8 +1,8 @@
 import React from 'react';
 import useCakeStore from '../../store/cakeStore';
+import { useLang } from '../../i18n';
 import styles from './Steps.module.css';
 
-// ── Option card used across steps ──
 function OptionCard({ emoji, label, sublabel, selected, onClick, badge }) {
   return (
     <button
@@ -19,11 +19,10 @@ function OptionCard({ emoji, label, sublabel, selected, onClick, badge }) {
   );
 }
 
-// ── Step 1: Shape ──
 export function StepShape({ shapes }) {
   const { shape, setShape } = useCakeStore();
+  const { t } = useLang();
   const shapeEmojis = { round: '⭕', circle: '⭕', square: '⬛', heart: '❤️' };
-  const shapePrices = { round: 'Included', square: '+$2', heart: '+$5' };
 
   return (
     <div className={styles.grid3}>
@@ -32,7 +31,7 @@ export function StepShape({ shapes }) {
           key={s.id}
           emoji={shapeEmojis[s.slug] || '🔵'}
           label={s.name}
-          sublabel={parseFloat(s.price_modifier) > 0 ? `+$${s.price_modifier}` : 'Included'}
+          sublabel={parseFloat(s.price_modifier) > 0 ? `+$${s.price_modifier}` : t.builder.included}
           selected={shape?.id === s.id}
           onClick={() => setShape(s)}
         />
@@ -41,14 +40,14 @@ export function StepShape({ shapes }) {
   );
 }
 
-// ── Step 2: Size ──
 export function StepSize({ sizes, pricePerKg }) {
-  const { size, setSize, shape } = useCakeStore();
+  const { size, setSize } = useCakeStore();
+  const { t } = useLang();
   const base = parseFloat(pricePerKg) || 15;
 
   return (
     <div>
-      <p className={styles.stepHint}>Price is calculated as base rate × size × shape</p>
+      <p className={styles.stepHint}>{t.builder.sizeHint}</p>
       <div className={styles.grid3}>
         {sizes.map((s) => {
           const price = (base * parseFloat(s.weight_kg) * parseFloat(s.price_multiplier)).toFixed(2);
@@ -57,10 +56,10 @@ export function StepSize({ sizes, pricePerKg }) {
               key={s.id}
               emoji={s.weight_kg <= 1 ? '🍰' : s.weight_kg <= 2 ? '🎂' : '🎆'}
               label={`${s.weight_kg} kg`}
-              sublabel={`from $${price}`}
+              sublabel={`${t.builder.from} $${price}`}
               selected={size?.id === s.id}
               onClick={() => setSize(s)}
-              badge={s.weight_kg === 2 ? 'Popular' : null}
+              badge={s.weight_kg === 2 ? t.builder.popular : null}
             />
           );
         })}
@@ -69,9 +68,9 @@ export function StepSize({ sizes, pricePerKg }) {
   );
 }
 
-// ── Step 3: Filling ──
 export function StepFilling({ fillings }) {
   const { filling, setFilling } = useCakeStore();
+  const { t } = useLang();
   const fillingEmojis = { Chocolate: '🍫', Vanilla: '🤍', Strawberry: '🍓', 'Red Velvet': '❤️' };
 
   return (
@@ -81,7 +80,7 @@ export function StepFilling({ fillings }) {
           key={f.id}
           emoji={fillingEmojis[f.name] || '🎂'}
           label={f.name}
-          sublabel={parseFloat(f.price_modifier) > 0 ? `+$${f.price_modifier}` : 'Included'}
+          sublabel={parseFloat(f.price_modifier) > 0 ? `+$${f.price_modifier}` : t.builder.included}
           selected={filling?.id === f.id}
           onClick={() => setFilling(f)}
         />
@@ -90,9 +89,9 @@ export function StepFilling({ fillings }) {
   );
 }
 
-// ── Step 4: Cream ──
 export function StepCream({ creams }) {
   const { cream, setCream } = useCakeStore();
+  const { t } = useLang();
   const creamEmojis = { Buttercream: '🧈', 'Chocolate Cream': '🍫', 'Vanilla Cream': '🤍' };
 
   return (
@@ -102,7 +101,7 @@ export function StepCream({ creams }) {
           key={c.id}
           emoji={creamEmojis[c.name] || '🧁'}
           label={c.name}
-          sublabel={parseFloat(c.price_modifier) > 0 ? `+$${c.price_modifier}` : 'Included'}
+          sublabel={parseFloat(c.price_modifier) > 0 ? `+$${c.price_modifier}` : t.builder.included}
           selected={cream?.id === c.id}
           onClick={() => setCream(c)}
         />
@@ -111,14 +110,14 @@ export function StepCream({ creams }) {
   );
 }
 
-// ── Step 5: Decorations ──
 export function StepDecorations({ decorations }) {
   const { decorations: selected, toggleDecoration } = useCakeStore();
+  const { t } = useLang();
   const decorEmojis = { 'Fresh Fruits': '🍊', Berries: '🫐', 'Chocolate Pieces': '🍫', 'Custom Figures': '🎭' };
 
   return (
     <div>
-      <p className={styles.stepHint}>Pick as many as you like — or skip this step</p>
+      <p className={styles.stepHint}>{t.builder.decorHint}</p>
       <div className={styles.grid2}>
         {decorations.map((d) => {
           const isSelected = selected.some((s) => s.id === d.id);
@@ -138,24 +137,24 @@ export function StepDecorations({ decorations }) {
   );
 }
 
-// ── Step 6: Text ──
 export function StepText() {
   const { cakeText, setCakeText } = useCakeStore();
+  const { t } = useLang();
 
   return (
     <div className={styles.textStep}>
-      <p className={styles.stepHint}>Add a personal message to your cake — or leave it blank</p>
+      <p className={styles.stepHint}>{t.builder.textHint}</p>
       <div className={styles.textPreview}>
         <div className={styles.cakePreviewBg}>🎂</div>
         {cakeText && <div className={styles.cakeTextOverlay}>"{cakeText}"</div>}
       </div>
       <div className="form-group mt-4">
-        <label className="form-label">Message on the cake</label>
+        <label className="form-label">{t.builder.textLabel}</label>
         <input
           className="form-input"
           type="text"
           maxLength={40}
-          placeholder='e.g. "Happy Birthday Sarah! 🎉"'
+          placeholder={t.builder.textPlaceholder}
           value={cakeText}
           onChange={(e) => setCakeText(e.target.value)}
         />

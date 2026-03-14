@@ -1,18 +1,21 @@
 import React from 'react';
 import useCakeStore from '../../store/cakeStore';
+import { useLang } from '../../i18n';
 import styles from './CakeSummary.module.css';
 
 export default function CakeSummary() {
   const { shape, size, filling, cream, decorations, cakeText, calculatePrice } = useCakeStore();
+  const { t } = useLang();
+  const B = t.builder;
   const price = calculatePrice();
 
   const rows = [
-    { label: 'Shape', value: shape?.name, emoji: '🔵' },
-    { label: 'Size', value: size ? `${size.weight_kg} kg` : null, emoji: '⚖️' },
-    { label: 'Filling', value: filling?.name, emoji: '🍫' },
-    { label: 'Cream', value: cream?.name, emoji: '🧁' },
-    { label: 'Decorations', value: decorations.length ? decorations.map(d => d.name).join(', ') : null, emoji: '🍓' },
-    { label: 'Text', value: cakeText || null, emoji: '✍️' },
+    { label: B.shapeLabel,   value: shape?.name,   emoji: '🔵' },
+    { label: B.sizeLabel,    value: size ? `${size.weight_kg} kg` : null, emoji: '⚖️' },
+    { label: B.fillingLabel, value: filling?.name,  emoji: '🍫' },
+    { label: B.creamLabel,   value: cream?.name,    emoji: '🧁' },
+    { label: B.decorLabel,   value: decorations.length ? decorations.map(d => d.name).join(', ') : null, emoji: '🍓' },
+    { label: B.textSummaryLabel, value: cakeText || null, emoji: '✍️' },
   ].filter(r => r.value);
 
   if (!rows.length) return null;
@@ -21,7 +24,7 @@ export default function CakeSummary() {
     <div className={styles.summary}>
       <div className={styles.header}>
         <span>🎂</span>
-        <span>Your cake so far</span>
+        <span>{B.yourCakeSoFar}</span>
       </div>
       <div className={styles.rows}>
         {rows.map(r => (
@@ -33,7 +36,7 @@ export default function CakeSummary() {
         ))}
       </div>
       <div className={styles.total}>
-        <span>Total</span>
+        <span>{t.common.total}</span>
         <span className={styles.totalPrice}>${price.toFixed(2)}</span>
       </div>
     </div>
