@@ -6,7 +6,7 @@ import { toast } from 'react-hot-toast';
 import { useLang, LangSwitcher } from '../i18n';
 import styles from './AdminDashboard.module.css';
 
-function AdminSidebar({ onClose }) {
+function AdminSidebar({ onClose, isOpen }) {
   const { user, logout } = useAuthStore();
   const navigate = useNavigate();
   const { t } = useLang();
@@ -20,7 +20,7 @@ function AdminSidebar({ onClose }) {
   ];
 
   return (
-    <aside className={styles.sidebar}>
+    <aside className={`${styles.sidebar} ${isOpen ? styles.sidebarOpen : ""}`}>
       <div className={styles.sidebarHeader}>
         <div className={styles.brandLogo}>🍰</div>
         <div>
@@ -217,7 +217,7 @@ export default function AdminDashboard() {
   return (
     <div className={styles.layout}>
       {sidebarOpen && <div className={styles.overlay} onClick={() => setSidebarOpen(false)} />}
-      <AdminSidebar onClose={() => setSidebarOpen(false)} />
+      <AdminSidebar onClose={() => setSidebarOpen(false)} isOpen={sidebarOpen} />
       <div className={styles.content}>
         <header className={styles.topbar}>
           <button className={styles.menuBtn} onClick={() => setSidebarOpen(true)}>☰</button>
