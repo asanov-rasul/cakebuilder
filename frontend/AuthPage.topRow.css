@@ -1,0 +1,10 @@
+/* Add to AuthPage.module.css */
+.topRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 32px;
+}
+.topRow .logo {
+  margin-bottom: 0;
+}
