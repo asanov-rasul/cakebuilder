@@ -113,7 +113,7 @@ export default function OrderForm({ shopId, shopName, onOrderPlaced, onBack }) {
               {O.editCake}
             </button>
             <button type="submit" className="btn btn-primary btn-lg" disabled={loading}>
-              {loading ? <span className="spinner" /> : `${O.placeOrder} · ${\1} TMT TMT`}
+              {loading ? <span className="spinner" /> : `${O.placeOrder} · ${price.toFixed(2)} TMT`}
             </button>
           </div>
         </form>
