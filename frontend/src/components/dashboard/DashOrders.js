@@ -27,6 +27,13 @@ function fmtDate(d) {
   if (!d) return '—';
   return new Date(d).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
 }
+function fmtDateTime(d) {
+  if (!d) return '—';
+  const dt = new Date(d);
+  const date = dt.toLocaleDateString('ru-RU', { day: 'numeric', month: 'short' });
+  const time = dt.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' });
+  return `${date}, ${time}`;
+}
 function fmtDateShort(d) {
   if (!d) return '—';
   return new Date(d).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
@@ -100,6 +107,7 @@ function OrderDetailModal({ order, onClose, onStatusChange }) {
 
           <div className={styles.modalSection}>
             <div className={styles.modalSectionTitle}>📦 Delivery</div>
+            <div className={styles.modalRow}><span>Получен</span><strong className={styles.receivedTime}>{fmtDateTime(order.created_at)}</strong></div>
             <div className={styles.modalRow}>
               <span>Date</span>
               <strong>{fmtDate(order.delivery_date)}{order.delivery_time ? ` at ${order.delivery_time}` : ''}</strong>
@@ -250,7 +258,7 @@ export default function DashOrders() {
                   >
                     <td>
                       <div className={styles.orderNumCell}>#{order.order_number}</div>
-                      <div className={styles.orderDate}>{fmtDateShort(order.created_at)}</div>
+                      <div className={styles.orderDate}>{fmtDateTime(order.created_at)}</div>
                     </td>
                     <td>
                       <div className={styles.customerName}>{order.customer_name}</div>
