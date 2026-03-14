@@ -143,8 +143,17 @@ router.patch('/shops/:id', async (req, res) => {
   const {
     is_active, subscription_status, subscription_plan,
     name, description, city, address, phone, email,
-    price_per_kg_base,
+    price_per_kg_base, trial_ends_at, subscription_ends_at,
+    trial_days, // convenience: number of days from now
   } = req.body;
+
+  // If trial_days passed, calculate trial_ends_at from now
+  let trialEndsAt = trial_ends_at || null;
+  if (trial_days !== undefined && trial_days !== null) {
+    const d = new Date();
+    d.setDate(d.getDate() + parseInt(trial_days));
+    trialEndsAt = d.toISOString();
+  }
 
   try {
     const result = await db.query(
@@ -159,11 +168,14 @@ router.patch('/shops/:id', async (req, res) => {
         phone = COALESCE($8, phone),
         email = COALESCE($9, email),
         price_per_kg_base = COALESCE($10, price_per_kg_base),
+        trial_ends_at = COALESCE($11::timestamp, trial_ends_at),
+        subscription_ends_at = COALESCE($12::timestamp, subscription_ends_at),
         updated_at = NOW()
-       WHERE id = $11 RETURNING *`,
+       WHERE id = $13 RETURNING *`,
       [is_active, subscription_status, subscription_plan,
        name, description, city, address, phone, email,
-       price_per_kg_base, req.params.id]
+       price_per_kg_base, trialEndsAt, subscription_ends_at || null,
+       req.params.id]
     );
     if (!result.rows.length) return res.status(404).json({ error: 'Магазин не найден' });
     res.json(result.rows[0]);
