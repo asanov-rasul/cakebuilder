@@ -1,45 +1,83 @@
-import React, { useState } from 'react';
+import React, { useRef, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import styles from './LandingPage.module.css';
 
-const features = [
-  { icon: '🎂', title: 'Cake Builder', desc: 'Step-by-step customization for shape, filling, cream, decorations, and personal text.' },
-  { icon: '📦', title: 'Order Management', desc: 'Receive and manage orders with status tracking from new to completed.' },
-  { icon: '🎨', title: 'Custom Menu', desc: 'Set your own fillings, creams, decorations, and prices. Full control.' },
-  { icon: '📱', title: 'Mobile-First', desc: 'Customers order from any device. Large buttons, smooth experience.' },
-  { icon: '🔗', title: 'Your Shop URL', desc: 'Get a unique link like /shop/yourname to share with customers.' },
-  { icon: '📊', title: 'Dashboard', desc: 'View revenue, orders, and manage your shop from one clean dashboard.' },
-];
-
-const steps = [
-  { n: '01', title: 'Sign up your shop', desc: 'Create an account, enter your shop details, and get your unique shop URL.' },
-  { n: '02', title: 'Customize your menu', desc: 'Set cake options, prices, fillings, and decorations in your dashboard.' },
-  { n: '03', title: 'Share & receive orders', desc: 'Share your link. Customers build their cake and place orders directly.' },
-];
-
-const plans = [
+const BENEFITS = [
   {
-    name: 'Starter',
-    price: '$10',
-    period: '/month',
-    desc: 'Perfect for small bakeries just getting started.',
-    features: ['Up to 100 orders/month', 'Cake builder', 'Order management', 'Shop profile page', '14-day free trial'],
-    cta: 'Start Free Trial',
-    highlight: false,
+    icon: '🎯',
+    title: 'Меньше ошибок в заказах',
+    desc: 'Клиент видит точную 3D модель своего торта до оформления заказа — форму, крем, украшения. Никаких недопониманий по телефону.',
   },
   {
-    name: 'Business',
-    price: '$20',
-    period: '/month',
-    desc: 'For growing shops with high order volume.',
-    features: ['Unlimited orders', 'Everything in Starter', 'Advanced analytics', 'Priority support', '14-day free trial'],
-    cta: 'Start Free Trial',
-    highlight: true,
+    icon: '⏱️',
+    title: 'Быстрее принятие решения',
+    desc: 'Визуализация в реальном времени ускоряет выбор. Клиент не откладывает заказ — он видит результат прямо сейчас.',
   },
+  {
+    icon: '💰',
+    title: 'Выше средний чек',
+    desc: 'Когда клиент видит торт с украшениями в 3D, он охотнее добавляет фрукты, посыпки и другие опции.',
+  },
+  {
+    icon: '📱',
+    title: 'Работает на любом устройстве',
+    desc: '3D рендер запускается прямо в браузере — без приложений, без загрузок. На телефоне, планшете, компьютере.',
+  },
+  {
+    icon: '🔄',
+    title: 'Обновляется мгновенно',
+    desc: 'Каждый шаг выбора — форма, начинка, крем, текст — сразу отражается на модели. Никаких задержек.',
+  },
+  {
+    icon: '❤️',
+    title: 'Запоминающийся опыт',
+    desc: 'Клиенты возвращаются и рекомендуют магазин другим — потому что процесс заказа был интересным и наглядным.',
+  },
+];
+
+const TECH_POINTS = [
+  { label: 'Реалистичные материалы', detail: 'PBR-шейдеры, тени, ACES tone mapping — торт выглядит как фото' },
+  { label: 'Форма сердце, круг, квадрат', detail: 'Параметрические геометрии с органическими смещениями вершин' },
+  { label: 'Живые свечи', detail: 'Анимированное пламя с точечным светом и мерцанием' },
+  { label: 'Реальные фрукты', detail: 'Клубника с семечками, дольки апельсина, черника с короной' },
+  { label: 'Надпись на торте', detail: 'Canvas-текстура с каллиграфическим шрифтом прямо на поверхности крема' },
+  { label: 'Вращение и drag', detail: 'Плавное вращение мышью или пальцем, автоспин' },
 ];
 
 export default function LandingPage() {
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const canvasRef = useRef(null);
+
+  // Animated gradient background blob
+  useEffect(() => {
+    const el = canvasRef.current;
+    if (!el) return;
+    let frame, t = 0;
+    const ctx = el.getContext('2d');
+    const resize = () => { el.width = el.offsetWidth; el.height = el.offsetHeight; };
+    resize();
+    window.addEventListener('resize', resize);
+
+    const draw = () => {
+      frame = requestAnimationFrame(draw);
+      t += 0.008;
+      const { width: w, height: h } = el;
+      ctx.clearRect(0, 0, w, h);
+
+      const blobs = [
+        { x: w*0.25 + Math.sin(t)*w*0.08, y: h*0.35 + Math.cos(t*0.7)*h*0.06, r: w*0.28, c: 'rgba(232,97,74,0.13)' },
+        { x: w*0.75 + Math.cos(t*0.9)*w*0.06, y: h*0.55 + Math.sin(t*1.1)*h*0.08, r: w*0.22, c: 'rgba(212,165,116,0.12)' },
+        { x: w*0.5  + Math.sin(t*1.3)*w*0.05, y: h*0.2  + Math.cos(t*0.8)*h*0.05, r: w*0.18, c: 'rgba(232,97,74,0.08)' },
+      ];
+      blobs.forEach(b => {
+        const g = ctx.createRadialGradient(b.x, b.y, 0, b.x, b.y, b.r);
+        g.addColorStop(0, b.c); g.addColorStop(1, 'transparent');
+        ctx.fillStyle = g; ctx.beginPath();
+        ctx.arc(b.x, b.y, b.r, 0, Math.PI*2); ctx.fill();
+      });
+    };
+    draw();
+    return () => { cancelAnimationFrame(frame); window.removeEventListener('resize', resize); };
+  }, []);
 
   return (
     <div className={styles.page}>
@@ -50,118 +88,107 @@ export default function LandingPage() {
             <span className={styles.logoIcon}>🍰</span>
             <span className={styles.logoText}>CakeBuilder</span>
           </div>
-          <div className={styles.navLinks}>
-            <a href="#how-it-works" className={styles.navLink}>How it works</a>
-            <a href="#features" className={styles.navLink}>Features</a>
-            <a href="#pricing" className={styles.navLink}>Pricing</a>
-          </div>
           <div className={styles.navActions}>
-            <Link to="/login" className="btn btn-ghost btn-sm">Sign in</Link>
-            <Link to="/register" className="btn btn-primary btn-sm">Get started free</Link>
+            <Link to="/login" className="btn btn-ghost btn-sm">Войти</Link>
           </div>
         </div>
       </nav>
 
       {/* Hero */}
       <section className={styles.hero}>
+        <canvas ref={canvasRef} className={styles.heroBgCanvas} />
         <div className={styles.container}>
-          <div className={styles.heroBadge}>✨ 14-day free trial · No credit card required</div>
+          <div className={styles.heroBadge}>🚀 Технология 3D визуализации</div>
           <h1 className={styles.heroTitle}>
-            Let customers build<br />
-            <em>their dream cake</em>
+            Клиент видит свой торт<br />
+            <em>до того как его заказать</em>
           </h1>
           <p className={styles.heroSubtitle}>
-            Give your bakery a beautiful online ordering experience. Customers customise their cake step-by-step and place orders directly — no phone calls needed.
+            Интерактивная 3D модель строится в реальном времени прямо в браузере — пока клиент выбирает форму, крем, украшения и добавляет надпись.
           </p>
           <div className={styles.heroCtas}>
-            <Link to="/register" className="btn btn-primary btn-xl">Start for free</Link>
-            <Link to="/shop/sweetcake" className="btn btn-outline btn-lg">See a demo shop →</Link>
+            <Link to="/shop/sweetcake" className="btn btn-primary btn-xl">Посмотреть демо →</Link>
           </div>
 
-          {/* Mock UI preview */}
+          {/* Demo preview card */}
           <div className={styles.heroPreview}>
             <div className={styles.previewBar}>
-              <div className={styles.previewDots}>
-                <span /><span /><span />
-              </div>
+              <div className={styles.previewDots}><span /><span /><span /></div>
               <div className={styles.previewUrl}>cakebuilder.app/shop/sweetcake</div>
             </div>
             <div className={styles.previewBody}>
-              <div className={styles.previewStep}>
-                <div className={styles.previewStepLabel}>Step 1 of 6 · Choose shape</div>
-                <div className={styles.previewOptions}>
-                  <div className={`${styles.previewOption} ${styles.selected}`}>🔵 Round</div>
-                  <div className={styles.previewOption}>⬛ Square</div>
-                  <div className={styles.previewOption}>❤️ Heart</div>
+              <div className={styles.previewLeft}>
+                <div className={styles.preview3dBox}>
+                  <div className={styles.preview3dCake}>🎂</div>
+                  <div className={styles.preview3dLabel}>3D · Drag to rotate</div>
                 </div>
               </div>
-              <div className={styles.previewPrice}>
-                <span>Total price</span>
-                <strong>$32.50</strong>
+              <div className={styles.previewRight}>
+                <div className={styles.previewStep}>
+                  <div className={styles.previewStepLabel}>Шаг 2 из 6 · Украшения</div>
+                  <div className={styles.previewOptions}>
+                    <div className={`${styles.previewOption} ${styles.selected}`}>🍓 Фрукты</div>
+                    <div className={styles.previewOption}>🫐 Ягоды</div>
+                    <div className={styles.previewOption}>🍫 Шоколад</div>
+                  </div>
+                </div>
+                <div className={styles.previewPrice}>
+                  <span>Итого</span>
+                  <strong>$47.50</strong>
+                </div>
               </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* How it works */}
-      <section className={styles.section} id="how-it-works">
+      {/* Benefits */}
+      <section className={`${styles.section} ${styles.sectionAlt}`} id="benefits">
         <div className={styles.container}>
-          <div className={styles.sectionLabel}>How it works</div>
-          <h2 className={styles.sectionTitle}>Up and running in minutes</h2>
-          <div className={styles.stepsGrid}>
-            {steps.map((s) => (
-              <div key={s.n} className={styles.stepCard}>
-                <div className={styles.stepNumber}>{s.n}</div>
-                <h3 className={styles.stepTitle}>{s.title}</h3>
-                <p className={styles.stepDesc}>{s.desc}</p>
+          <div className={styles.sectionLabel}>Преимущества</div>
+          <h2 className={styles.sectionTitle}>Почему 3D визуализация работает</h2>
+          <div className={styles.benefitsGrid}>
+            {BENEFITS.map(b => (
+              <div key={b.title} className={styles.benefitCard}>
+                <div className={styles.benefitIcon}>{b.icon}</div>
+                <h3 className={styles.benefitTitle}>{b.title}</h3>
+                <p className={styles.benefitDesc}>{b.desc}</p>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Features */}
-      <section className={`${styles.section} ${styles.sectionAlt}`} id="features">
+      {/* Tech showcase */}
+      <section className={styles.section} id="tech">
         <div className={styles.container}>
-          <div className={styles.sectionLabel}>Features</div>
-          <h2 className={styles.sectionTitle}>Everything your bakery needs</h2>
-          <div className={styles.featuresGrid}>
-            {features.map((f) => (
-              <div key={f.title} className={styles.featureCard}>
-                <div className={styles.featureIcon}>{f.icon}</div>
-                <h3 className={styles.featureTitle}>{f.title}</h3>
-                <p className={styles.featureDesc}>{f.desc}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Pricing */}
-      <section className={styles.section} id="pricing">
-        <div className={styles.container}>
-          <div className={styles.sectionLabel}>Pricing</div>
-          <h2 className={styles.sectionTitle}>Simple, honest pricing</h2>
-          <div className={styles.plansGrid}>
-            {plans.map((p) => (
-              <div key={p.name} className={`${styles.planCard} ${p.highlight ? styles.planHighlight : ''}`}>
-                {p.highlight && <div className={styles.planBadge}>Most popular</div>}
-                <div className={styles.planName}>{p.name}</div>
-                <div className={styles.planPrice}>
-                  {p.price}<span>{p.period}</span>
+          <div className={styles.sectionLabel}>Технология</div>
+          <h2 className={styles.sectionTitle}>Что умеет наш 3D движок</h2>
+          <div className={styles.techLayout}>
+            <div className={styles.techPoints}>
+              {TECH_POINTS.map(p => (
+                <div key={p.label} className={styles.techPoint}>
+                  <div className={styles.techDot} />
+                  <div>
+                    <div className={styles.techLabel}>{p.label}</div>
+                    <div className={styles.techDetail}>{p.detail}</div>
+                  </div>
                 </div>
-                <p className={styles.planDesc}>{p.desc}</p>
-                <ul className={styles.planFeatures}>
-                  {p.features.map((f) => (
-                    <li key={f}><span>✓</span>{f}</li>
-                  ))}
-                </ul>
-                <Link to="/register" className={`btn w-full ${p.highlight ? 'btn-primary' : 'btn-outline'} btn-lg`}>
-                  {p.cta}
-                </Link>
+              ))}
+            </div>
+            <div className={styles.techVisual}>
+              <div className={styles.techScreen}>
+                <div className={styles.techScreenInner}>
+                  <div className={styles.techCakeEmoji}>🎂</div>
+                  <div className={styles.techScreenLines}>
+                    <div className={styles.techLine} style={{ width: '80%' }} />
+                    <div className={styles.techLine} style={{ width: '60%' }} />
+                    <div className={styles.techLine} style={{ width: '70%' }} />
+                  </div>
+                </div>
+                <div className={styles.techScreenLabel}>WebGL · Three.js · PBR Materials</div>
               </div>
-            ))}
+            </div>
           </div>
         </div>
       </section>
@@ -170,9 +197,9 @@ export default function LandingPage() {
       <section className={styles.ctaSection}>
         <div className={styles.container}>
           <div className={styles.ctaBox}>
-            <h2 className={styles.ctaTitle}>Ready to grow your bakery?</h2>
-            <p className={styles.ctaDesc}>Join hundreds of cake shops using CakeBuilder to take orders online.</p>
-            <Link to="/register" className="btn btn-primary btn-xl">Get started — it's free</Link>
+            <h2 className={styles.ctaTitle}>Хотите попробовать?</h2>
+            <p className={styles.ctaDesc}>Откройте демо-магазин и сами постройте торт в 3D — это занимает меньше минуты.</p>
+            <Link to="/shop/sweetcake" className="btn btn-primary btn-xl">Открыть демо магазин</Link>
           </div>
         </div>
       </section>
@@ -181,10 +208,8 @@ export default function LandingPage() {
       <footer className={styles.footer}>
         <div className={styles.container}>
           <div className={styles.footerInner}>
-            <div className={styles.footerLogo}>
-              <span>🍰</span> CakeBuilder
-            </div>
-            <p className={styles.footerCopy}>© 2026 CakeBuilder. All rights reserved.</p>
+            <div className={styles.footerLogo}><span>🍰</span> CakeBuilder</div>
+            <p className={styles.footerCopy}>© 2026 CakeBuilder</p>
           </div>
         </div>
       </footer>
