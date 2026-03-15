@@ -358,18 +358,23 @@ function buildCake(scene, state) {
     const topMat  = new THREE.MeshStandardMaterial({ color: cC.top,  roughness: 0.42, metalness: 0.04 });
 
     if (isHeart) {
-      // Full-height shell starting at Y=0
-      const shell = new THREE.Mesh(makeHeartSolidGeo(radius * 1.022, totalH), sideMat);
+      // Side shell only (open ends) — ExtrudeGeometry without bevel
+      const shellShape = makeHeartShape(radius * 1.022);
+      const shellGeo = new THREE.ExtrudeGeometry(shellShape, {
+        depth: totalH, bevelEnabled: false,
+      });
+      shellGeo.rotateX(-Math.PI / 2);
+      const shell = new THREE.Mesh(shellGeo, sideMat);
       shell.position.y = 0; shell.userData.isCake = true; group.add(shell);
 
-      // Top cap
+      // Top cap — flat ShapeGeometry placed at surfaceY with organic bumps
       const capGeo = makeHeartCapGeo(radius * 1.022);
       const cp = capGeo.attributes.position;
       for (let v = 0; v < cp.count; v++)
-        cp.setY(v, cp.getY(v) + snoise(cp.getX(v), cp.getZ(v), 5) * 0.012 + Math.random() * 0.004);
+        cp.setY(v, snoise(cp.getX(v), cp.getZ(v), 5) * 0.012 + Math.random() * 0.004);
       cp.needsUpdate = true; capGeo.computeVertexNormals();
       const cap = new THREE.Mesh(capGeo, topMat);
-      cap.position.y = surfaceY + 0.006;
+      cap.position.y = surfaceY + 0.004;
       cap.userData.isCake = true; group.add(cap);
 
     } else if (isSquare) {
@@ -574,28 +579,27 @@ function buildPlate(scene, radius, isSquare) {
 
   const r = isSquare ? radius * 1.52 : radius + 0.12;
 
-  // Plate body — FrontSide only so bottom face is invisible (no reflection)
-  const plate = new THREE.Mesh(
-    new THREE.CylinderGeometry(r, r*0.93, 0.032, 72),
-    new THREE.MeshStandardMaterial({
-      color: 0xfafafa, roughness: 0.55, metalness: 0.0,
-      side: THREE.FrontSide,
-    }));
-  plate.position.y = -0.016;
-  plate.receiveShadow = true; plate.userData.isPlate = true; scene.add(plate);
+  // Plate — top disc + side ring only, no bottom face to avoid reflection
+  // Top surface
+  const topDisc = new THREE.Mesh(
+    new THREE.CircleGeometry(r, 72),
+    new THREE.MeshStandardMaterial({ color: 0xfafafa, roughness: 0.5, metalness: 0.0 }));
+  topDisc.rotation.x = -Math.PI / 2;
+  topDisc.position.y = -0.001;
+  topDisc.receiveShadow = true; topDisc.userData.isPlate = true; scene.add(topDisc);
 
-  // Solid disc covering the bottom — same colour as background, blocks any bleed-through
-  const cover = new THREE.Mesh(
-    new THREE.CircleGeometry(r * 0.98, 64),
-    new THREE.MeshBasicMaterial({ color: 0xfdf8f3, depthWrite: true }));
-  cover.rotation.x = Math.PI / 2;
-  cover.position.y = -0.033; // just below the plate bottom
-  cover.userData.isPlate = true; scene.add(cover);
+  // Side band (open cylinder, no caps)
+  const sideBand = new THREE.Mesh(
+    new THREE.CylinderGeometry(r, r * 0.93, 0.030, 72, 1, true),
+    new THREE.MeshStandardMaterial({ color: 0xf0f0f0, roughness: 0.55, metalness: 0.0, side: THREE.FrontSide }));
+  sideBand.position.y = -0.015;
+  sideBand.userData.isPlate = true; scene.add(sideBand);
 
+  // Rim ring on top edge
   const rim = new THREE.Mesh(
-    new THREE.TorusGeometry(r-0.01, 0.011, 8, 72),
-    new THREE.MeshStandardMaterial({ color: 0xeeeeee, roughness: 0.6, metalness: 0.0, side: THREE.FrontSide }));
-  rim.rotation.x = Math.PI/2; rim.position.y = -0.001;
+    new THREE.TorusGeometry(r - 0.01, 0.010, 8, 72),
+    new THREE.MeshStandardMaterial({ color: 0xe8e8e8, roughness: 0.5, metalness: 0.0 }));
+  rim.rotation.x = Math.PI / 2; rim.position.y = -0.001;
   rim.userData.isPlate = true; scene.add(rim);
 }
 
