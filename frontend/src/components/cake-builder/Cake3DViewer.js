@@ -21,37 +21,6 @@ const CREAM_COLORS = {
 const snoise = (x, y, s = 1) =>
   Math.sin(x * s * 2.1 + 0.5) * Math.cos(y * s * 1.7 + 1.3) * 0.5;
 
-/* ── Heart helpers ───────────────────────────────────────────────────────── */
-function makeHeartShape(r) {
-  const shape = new THREE.Shape();
-  for (let i = 0; i <= 128; i++) {
-    const t = (i / 128) * Math.PI * 2;
-    const x =  r * (16 * Math.sin(t) ** 3) / 16;
-    const y =  r * (13 * Math.cos(t) - 5 * Math.cos(2*t) - 2 * Math.cos(3*t) - Math.cos(4*t)) / 16;
-    i === 0 ? shape.moveTo(x, y) : shape.lineTo(x, y);
-  }
-  shape.closePath();
-  return shape;
-}
-
-// Returns geometry whose Y-axis range is [0, height].
-function makeHeartSolidGeo(r, height) {
-  const geo = new THREE.ExtrudeGeometry(makeHeartShape(r), {
-    depth: height, bevelEnabled: true,
-    bevelThickness: 0.01, bevelSize: 0.008, bevelSegments: 3,
-  });
-  // Shape is in XY, extruded along +Z.
-  // After rotateX(-PI/2): old +Z → new +Y  ✓
-  geo.rotateX(-Math.PI / 2);
-  return geo; // Y ∈ [0, height]
-}
-
-// Flat heart cap (zero thickness, lies at Y=0).
-function makeHeartCapGeo(r) {
-  const geo = new THREE.ShapeGeometry(makeHeartShape(r), 32);
-  geo.rotateX(-Math.PI / 2); // lies flat in XZ
-  return geo;
-}
 
 /* ── Decorations – all positions are ABSOLUTE inside the scene group ──────
    surfY = the Y-coordinate of the cake's top surface inside the group.      */
@@ -272,16 +241,14 @@ function buildCake(scene, state) {
 
   const { shape, size, filling, cream, decorations, cakeText } = state;
 
-  const kg     = size ? parseFloat(size.weight_kg) : 1;
-  // Square cakes get a smaller radius multiplier to stay on plate
+  const kg = size ? parseFloat(size.weight_kg) : 1;
+
+  const sn = (shape?.slug || shape?.name || 'round').toLowerCase();
+  const isSquare = sn === 'square';
   const radius = isSquare ? 0.30 + kg * 0.055 : 0.33 + kg * 0.11;
   const layerH = 0.16 + kg * 0.024;
   const layers = Math.round(1 + kg * 0.8);
   const gapH   = 0.036;
-
-  const sn = (shape?.slug || shape?.name || 'round').toLowerCase();
-  const isSquare = sn === 'square';
-  const isHeart  = false; // heart shape disabled — treated as round
 
   const fC = FILLING_COLORS[Object.keys(FILLING_COLORS).find(k => filling?.name?.includes(k)) || 'default'];
   const cC = CREAM_COLORS [Object.keys(CREAM_COLORS) .find(k => cream?.name?.includes(k))   || 'default'];
@@ -300,9 +267,7 @@ function buildCake(scene, state) {
     const layerBase = i * (layerH + gapH);   // absolute Y of layer bottom in group
 
     let geo;
-    if (isHeart) {
-      geo = makeHeartSolidGeo(radius, layerH); // Y ∈ [0, layerH]
-    } else if (isSquare) {
+    if (isSquare) {
       geo = new THREE.BoxGeometry(radius * 2, layerH, radius * 2, 4, 2, 4);
       // box is centred at Y=0; translate so base = 0
       geo.translate(0, layerH / 2, 0);
@@ -331,10 +296,7 @@ function buildCake(scene, state) {
     if (i < layers - 1) {
       const stripeBase = layerBase + layerH; // Y of stripe bottom in group
       let fillGeo;
-      if (isHeart) {
-        // thin extruded heart for gap
-        fillGeo = makeHeartSolidGeo(radius * 0.97, gapH);
-      } else if (isSquare) {
+      if (isSquare) {
         fillGeo = new THREE.BoxGeometry(radius * 1.96, gapH, radius * 1.96);
         fillGeo.translate(0, gapH / 2, 0);
       } else {
@@ -358,27 +320,7 @@ function buildCake(scene, state) {
     const sideMat = new THREE.MeshStandardMaterial({ color: cC.side, roughness: 0.52 });
     const topMat  = new THREE.MeshStandardMaterial({ color: cC.top,  roughness: 0.42, metalness: 0.04 });
 
-    if (isHeart) {
-      // Side shell only (open ends) — ExtrudeGeometry without bevel
-      const shellShape = makeHeartShape(radius * 1.022);
-      const shellGeo = new THREE.ExtrudeGeometry(shellShape, {
-        depth: totalH, bevelEnabled: false,
-      });
-      shellGeo.rotateX(-Math.PI / 2);
-      const shell = new THREE.Mesh(shellGeo, sideMat);
-      shell.position.y = 0; shell.userData.isCake = true; group.add(shell);
-
-      // Top cap — flat ShapeGeometry placed at surfaceY with organic bumps
-      const capGeo = makeHeartCapGeo(radius * 1.022);
-      const cp = capGeo.attributes.position;
-      for (let v = 0; v < cp.count; v++)
-        cp.setY(v, snoise(cp.getX(v), cp.getZ(v), 5) * 0.012 + Math.random() * 0.004);
-      cp.needsUpdate = true; capGeo.computeVertexNormals();
-      const cap = new THREE.Mesh(capGeo, topMat);
-      cap.position.y = surfaceY + 0.004;
-      cap.userData.isCake = true; group.add(cap);
-
-    } else if (isSquare) {
+    if (isSquare) {
       const pw = radius * 2 + 0.028;
       [[0, radius+0.014, 0], [0, -(radius+0.014), Math.PI],
        [radius+0.014, 0, Math.PI/2], [-(radius+0.014), 0, -Math.PI/2]
@@ -427,16 +369,10 @@ function buildCake(scene, state) {
 
     /* Drips — hang from the top surface down */
     const dripMat   = new THREE.MeshStandardMaterial({ color: cC.drip, roughness: 0.38, metalness: 0.04 });
-    const dripCount = isHeart ? 14 : 12;
+    const dripCount = 12;
     for (let d = 0; d < dripCount; d++) {
       let dx, dz;
-      if (isHeart) {
-        const t = (d / dripCount) * Math.PI * 2;
-        // Use same formula as heart shape but at the outer cream edge
-        const hr = radius * 1.018;
-        dx = hr * (16 * Math.sin(t)**3) / 16;
-        dz = hr * (13*Math.cos(t) - 5*Math.cos(2*t) - 2*Math.cos(3*t) - Math.cos(4*t)) / 16;
-      } else {
+      {
         const a = (d / dripCount) * Math.PI * 2 + (Math.random()-.5)*.3;
         const dr = isSquare ? radius+0.007 : radius+0.010;
         dx = Math.cos(a)*dr; dz = Math.sin(a)*dr;
@@ -549,12 +485,10 @@ function buildCake(scene, state) {
   /* ── Text ────────────────────────────────────────────────────────────────
      Rendered as a flat plane just above the cream surface.               */
   if (cakeText && cakeText.trim()) {
-    const tr  = radius * (isHeart ? 0.70 : 0.84);
+    const tr  = radius * 0.84;
     const tGeo = isSquare
       ? new THREE.PlaneGeometry(tr*1.9, tr*1.9)
-      : isHeart
-        ? new THREE.PlaneGeometry(tr*1.85, tr*1.85)
-        : new THREE.CircleGeometry(tr, 64);
+      : new THREE.CircleGeometry(tr, 64);
     const tMat = new THREE.MeshStandardMaterial({
       map: makeTextTexture(cakeText.trim()),
       transparent: true, roughness: 0.6, depthWrite: false,
