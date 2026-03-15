@@ -158,7 +158,7 @@ BEGIN
     INSERT INTO shop_shapes (shop_id, name, slug, price_modifier, sort_order) VALUES
     (shop_id, 'Round', 'round', 0, 1),
     (shop_id, 'Square', 'square', 2, 2),
-    (shop_id, 'Heart', 'heart', 5, 3);
+    -- Heart shape removed
 
     -- Sizes
     INSERT INTO shop_sizes (shop_id, weight_kg, price_multiplier, sort_order) VALUES
