@@ -426,7 +426,8 @@ function buildCake(scene, state) {
       let dx, dz;
       if (isHeart) {
         const t = (d / dripCount) * Math.PI * 2;
-        const hr = radius * 0.90;
+        // Use same formula as heart shape but at the outer cream edge
+        const hr = radius * 1.018;
         dx = hr * (16 * Math.sin(t)**3) / 16;
         dz = hr * (13*Math.cos(t) - 5*Math.cos(2*t) - 2*Math.cos(3*t) - Math.cos(4*t)) / 16;
       } else {
@@ -572,15 +573,28 @@ function buildPlate(scene, radius, isSquare) {
   old.forEach(o => { o.geometry?.dispose(); o.material?.dispose(); scene.remove(o); });
 
   const r = isSquare ? radius * 1.52 : radius + 0.12;
+
+  // Plate body — FrontSide only so bottom face is invisible (no reflection)
   const plate = new THREE.Mesh(
     new THREE.CylinderGeometry(r, r*0.93, 0.032, 72),
-    new THREE.MeshStandardMaterial({ color: 0xfafafa, roughness: 0.55, metalness: 0.0 }));
+    new THREE.MeshStandardMaterial({
+      color: 0xfafafa, roughness: 0.55, metalness: 0.0,
+      side: THREE.FrontSide,
+    }));
   plate.position.y = -0.016;
   plate.receiveShadow = true; plate.userData.isPlate = true; scene.add(plate);
 
+  // Solid disc covering the bottom — same colour as background, blocks any bleed-through
+  const cover = new THREE.Mesh(
+    new THREE.CircleGeometry(r * 0.98, 64),
+    new THREE.MeshBasicMaterial({ color: 0xfdf8f3, depthWrite: true }));
+  cover.rotation.x = Math.PI / 2;
+  cover.position.y = -0.033; // just below the plate bottom
+  cover.userData.isPlate = true; scene.add(cover);
+
   const rim = new THREE.Mesh(
     new THREE.TorusGeometry(r-0.01, 0.011, 8, 72),
-    new THREE.MeshStandardMaterial({ color: 0xeeeeee, roughness: 0.6, metalness: 0.0 }));
+    new THREE.MeshStandardMaterial({ color: 0xeeeeee, roughness: 0.6, metalness: 0.0, side: THREE.FrontSide }));
   rim.rotation.x = Math.PI/2; rim.position.y = -0.001;
   rim.userData.isPlate = true; scene.add(rim);
 }
