@@ -273,14 +273,15 @@ function buildCake(scene, state) {
   const { shape, size, filling, cream, decorations, cakeText } = state;
 
   const kg     = size ? parseFloat(size.weight_kg) : 1;
-  const radius = 0.33 + kg * 0.11;
+  // Square cakes get a smaller radius multiplier to stay on plate
+  const radius = isSquare ? 0.30 + kg * 0.055 : 0.33 + kg * 0.11;
   const layerH = 0.16 + kg * 0.024;
   const layers = Math.round(1 + kg * 0.8);
   const gapH   = 0.036;
 
   const sn = (shape?.slug || shape?.name || 'round').toLowerCase();
   const isSquare = sn === 'square';
-  const isHeart  = sn === 'heart';
+  const isHeart  = false; // heart shape disabled — treated as round
 
   const fC = FILLING_COLORS[Object.keys(FILLING_COLORS).find(k => filling?.name?.includes(k)) || 'default'];
   const cC = CREAM_COLORS [Object.keys(CREAM_COLORS) .find(k => cream?.name?.includes(k))   || 'default'];
@@ -566,7 +567,8 @@ function buildCake(scene, state) {
   }
 
   /* Centre group so cake mid-point sits at world Y=0 */
-  group.position.y = -totalH / 2;
+  // Cake bottom at Y=0 (plate surface), top at Y=totalH
+  group.position.y = 0;
   scene.add(group);
   return { totalH, radius, isSquare };
 }
@@ -579,27 +581,28 @@ function buildPlate(scene, radius, isSquare) {
 
   const r = isSquare ? radius * 1.52 : radius + 0.12;
 
-  // Plate — top disc + side ring only, no bottom face to avoid reflection
-  // Top surface
-  const topDisc = new THREE.Mesh(
-    new THREE.CircleGeometry(r, 72),
-    new THREE.MeshStandardMaterial({ color: 0xfafafa, roughness: 0.5, metalness: 0.0 }));
+  // Plate sits with its TOP surface at Y=0 (where cake bottom sits)
+  const plateH = 0.028;
+  const plateMat = new THREE.MeshStandardMaterial({ color: 0xfafafa, roughness: 0.5, metalness: 0.0 });
+
+  // Top disc at Y=0
+  const topDisc = new THREE.Mesh(new THREE.CircleGeometry(r, 72), plateMat);
   topDisc.rotation.x = -Math.PI / 2;
-  topDisc.position.y = -0.001;
+  topDisc.position.y = 0;
   topDisc.receiveShadow = true; topDisc.userData.isPlate = true; scene.add(topDisc);
 
-  // Side band (open cylinder, no caps)
+  // Side band — open cylinder, top at Y=0, bottom at Y=-plateH
   const sideBand = new THREE.Mesh(
-    new THREE.CylinderGeometry(r, r * 0.93, 0.030, 72, 1, true),
+    new THREE.CylinderGeometry(r, r * 0.93, plateH, 72, 1, true),
     new THREE.MeshStandardMaterial({ color: 0xf0f0f0, roughness: 0.55, metalness: 0.0, side: THREE.FrontSide }));
-  sideBand.position.y = -0.015;
+  sideBand.position.y = -plateH / 2;
   sideBand.userData.isPlate = true; scene.add(sideBand);
 
-  // Rim ring on top edge
+  // Rim ring right at plate top edge
   const rim = new THREE.Mesh(
     new THREE.TorusGeometry(r - 0.01, 0.010, 8, 72),
     new THREE.MeshStandardMaterial({ color: 0xe8e8e8, roughness: 0.5, metalness: 0.0 }));
-  rim.rotation.x = Math.PI / 2; rim.position.y = -0.001;
+  rim.rotation.x = Math.PI / 2; rim.position.y = 0;
   rim.userData.isPlate = true; scene.add(rim);
 }
 
@@ -642,8 +645,8 @@ export default function Cake3DViewer() {
     sceneRef.current = scene;
 
     const camera = new THREE.PerspectiveCamera(40, W/H, 0.01, 100);
-    camera.position.set(0, 0.55, 2.3);
-    camera.lookAt(0, 0, 0);
+    camera.position.set(0, 0.8, 2.4);
+    camera.lookAt(0, 0.3, 0);
     cameraRef.current = camera;
 
     scene.add(new THREE.AmbientLight(0xfff5e0, 0.65));
@@ -682,7 +685,7 @@ export default function Cake3DViewer() {
           obj.rotation.y = currentRot.current;
       });
 
-      camera.position.y = 0.55 + Math.sin(t * 0.35) * 0.018;
+      camera.position.y = 0.8 + Math.sin(t * 0.35) * 0.018;
       renderer.render(scene, camera);
     };
     animate();
