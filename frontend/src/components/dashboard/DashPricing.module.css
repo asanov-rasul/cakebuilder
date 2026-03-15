@@ -1,0 +1,55 @@
+.page { max-width: 700px; display: flex; flex-direction: column; gap: 20px; }
+.pageHeader { margin-bottom: 8px; }
+.title { font-size: 28px; font-weight: 400; color: var(--chocolate); margin-bottom: 4px; }
+.sub { font-size: 14px; color: var(--gray-400); }
+
+.card {
+  background: var(--white); border: 1px solid var(--gray-100);
+  border-radius: var(--radius-xl); padding: 24px;
+  box-shadow: var(--shadow-sm);
+}
+.cardTitle { font-size: 17px; font-weight: 600; color: var(--chocolate); margin-bottom: 6px; }
+.cardDesc { font-size: 13px; color: var(--gray-400); margin-bottom: 20px; line-height: 1.5; }
+
+.basePriceRow { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.inputGroup { display: flex; align-items: center; gap: 0; position: relative; }
+.inputPrefix {
+  position: absolute; left: 10px; font-size: 14px; color: var(--gray-400);
+  z-index: 1; pointer-events: none;
+}
+.inputSuffix { font-size: 14px; color: var(--gray-400); margin-left: 10px; white-space: nowrap; }
+
+.table { display: flex; flex-direction: column; gap: 0; }
+.tableHead {
+  display: grid; grid-template-columns: 1fr 140px 120px;
+  padding: 8px 0 8px; border-bottom: 1px solid var(--gray-100);
+  font-size: 12px; font-weight: 600; color: var(--gray-400);
+  text-transform: uppercase; letter-spacing: 0.4px;
+}
+.tableRow {
+  display: grid; grid-template-columns: 1fr 140px 120px;
+  align-items: center;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--gray-50);
+}
+.tableRow:last-child { border-bottom: none; }
+.rowDisabled { opacity: 0.4; }
+.sizeLabel { font-size: 14px; font-weight: 500; color: var(--chocolate); }
+.itemName { font-size: 14px; font-weight: 500; color: var(--chocolate); }
+
+/* Two-column table for modifiers */
+.card:not(:first-of-type) .tableHead { grid-template-columns: 1fr 140px; }
+.card:not(:first-of-type) .tableRow { grid-template-columns: 1fr 140px; }
+
+.multiplierInput { display: flex; align-items: center; gap: 6px; }
+.multiplierInput .form-input { padding: 7px 10px; font-size: 13px; }
+.xLabel { font-size: 13px; color: var(--gray-400); }
+.examplePrice { font-size: 14px; font-weight: 600; color: var(--chocolate); font-family: var(--font-display); }
+
+.priceInputGroup { position: relative; display: flex; align-items: center; }
+.dollarPrefix {
+  position: absolute; left: 8px; font-size: 13px; color: var(--gray-400); z-index: 1; pointer-events: none;
+}
+.priceInputGroup .form-input { padding: 7px 10px 7px 22px; font-size: 13px; }
+
+.emptyRow { padding: 16px 0; font-size: 13px; color: var(--gray-300); }

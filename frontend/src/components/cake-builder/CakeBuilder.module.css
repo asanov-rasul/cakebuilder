@@ -1,0 +1,77 @@
+.wrap { display: flex; flex-direction: column; gap: 0; }
+
+/* Step nav */
+.stepNav {
+  display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 20px; justify-content: center;
+}
+.stepPill {
+  display: flex; align-items: center; gap: 6px;
+  padding: 7px 14px; border-radius: var(--radius-full);
+  font-size: 13px; font-weight: 500;
+  border: 1.5px solid var(--gray-200); background: var(--white);
+  color: var(--gray-400); cursor: default;
+  transition: all 0.15s;
+}
+.stepPill:disabled { opacity: 0.5; }
+.pillActive { border-color: var(--rose); color: var(--rose); background: var(--rose-light); }
+.pillDone { border-color: var(--sage); color: var(--sage); background: var(--sage-light); cursor: pointer; }
+.pillDone:hover { opacity: 0.8; }
+.pillEmoji { font-size: 14px; }
+@media (max-width: 500px) { .pillLabel { display: none; } .stepPill { padding: 8px 12px; } }
+
+/* Two-column main layout */
+.mainLayout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  align-items: start;
+}
+@media (max-width: 700px) {
+  .mainLayout { grid-template-columns: 1fr; }
+}
+
+/* Viewer column */
+.viewerCol {
+  position: sticky;
+  top: 80px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.priceTag {
+  display: flex; align-items: center; justify-content: space-between;
+  background: var(--white); border: 1px solid var(--gray-100);
+  border-radius: var(--radius-lg); padding: 14px 18px;
+  box-shadow: var(--shadow-sm);
+}
+.priceTagLabel { font-size: 13px; color: var(--gray-400); font-weight: 500; }
+.priceTagValue {
+  font-family: var(--font-display); font-size: 28px;
+  font-weight: 400; color: var(--chocolate); line-height: 1;
+}
+
+/* Step column */
+.stepCol { display: flex; flex-direction: column; gap: 14px; }
+
+.stepContent {
+  background: var(--white); border-radius: var(--radius-xl);
+  border: 1px solid var(--gray-100); box-shadow: var(--shadow);
+  padding: 24px;
+}
+.stepHeader { display: flex; align-items: center; gap: 10px; margin-bottom: 20px; }
+.stepTitle { font-size: 20px; font-weight: 400; color: var(--chocolate); }
+.optionalTag {
+  font-size: 11px; font-weight: 500; padding: 3px 10px;
+  background: var(--caramel-light); color: var(--caramel);
+  border-radius: var(--radius-full); margin-left: auto;
+}
+
+.navBtns {
+  display: flex; gap: 10px; justify-content: flex-end;
+}
+
+/* On mobile: show viewer above steps */
+@media (max-width: 700px) {
+  .viewerCol { position: static; }
+}

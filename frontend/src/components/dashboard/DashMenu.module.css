@@ -1,0 +1,73 @@
+.page { max-width: 900px; }
+.pageHeader { margin-bottom: 28px; }
+.title { font-size: 28px; font-weight: 400; color: var(--chocolate); margin-bottom: 4px; }
+.sub { font-size: 14px; color: var(--gray-400); }
+
+.grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+@media (max-width: 680px) { .grid { grid-template-columns: 1fr; } }
+
+.section {
+  background: var(--white); border: 1px solid var(--gray-100);
+  border-radius: var(--radius-xl); overflow: hidden;
+  box-shadow: var(--shadow-sm);
+}
+.sectionHeader {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 18px 20px; border-bottom: 1px solid var(--gray-100);
+  background: var(--gray-50);
+}
+.sectionTitle { display: flex; align-items: center; gap: 8px; font-size: 15px; font-weight: 600; color: var(--chocolate); }
+.count {
+  font-size: 12px; font-weight: 600; padding: 2px 8px;
+  background: var(--gray-200); color: var(--gray-500);
+  border-radius: var(--radius-full);
+}
+
+.addForm {
+  display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
+  padding: 14px 20px; background: var(--cream-100);
+  border-bottom: 1px solid var(--gray-100);
+}
+.addForm .form-input { flex: 1; min-width: 100px; padding: 8px 12px; font-size: 13px; }
+.priceInputWrap { display: flex; align-items: center; gap: 0; position: relative; }
+.dollarSign {
+  position: absolute; left: 10px; font-size: 13px; color: var(--gray-400); z-index: 1; pointer-events: none;
+}
+.priceInput { width: 90px !important; padding-left: 22px !important; }
+
+.itemsList { padding: 8px 0; }
+.emptySection { padding: 20px; text-align: center; font-size: 13px; color: var(--gray-300); }
+
+.itemRow {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 20px;
+  transition: background 0.12s;
+}
+.itemRow:hover { background: var(--gray-50); }
+.itemDisabled { opacity: 0.45; }
+.itemName { flex: 1; font-size: 14px; font-weight: 500; color: var(--chocolate); }
+.itemPrice { font-size: 13px; color: var(--gray-400); min-width: 64px; text-align: right; }
+
+.itemActions { display: flex; align-items: center; gap: 4px; }
+.editBtn, .deleteBtn {
+  background: none; border: none; cursor: pointer;
+  padding: 4px; font-size: 14px; border-radius: var(--radius-sm);
+  opacity: 0.5; transition: opacity 0.15s;
+  font-family: inherit;
+}
+.editBtn:hover, .deleteBtn:hover { opacity: 1; }
+
+.toggleBtn {
+  padding: 3px 10px; border-radius: var(--radius-full);
+  font-size: 11px; font-weight: 600; border: none; cursor: pointer;
+  transition: all 0.15s; font-family: var(--font-body);
+}
+.toggleOn { background: var(--sage-light); color: var(--sage); }
+.toggleOff { background: var(--gray-100); color: var(--gray-400); }
+.toggleOn:hover { background: #d1fae5; }
+.toggleOff:hover { background: var(--gray-200); }
+
+.editRow {
+  display: flex; align-items: center; gap: 8px; flex: 1; flex-wrap: wrap;
+}
+.editRow .form-input { padding: 6px 10px; font-size: 13px; }

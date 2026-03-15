@@ -1,0 +1,201 @@
+.page {
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}
+@media (max-width: 768px) {
+  .page { grid-template-columns: 1fr; }
+  .right { display: none; }
+}
+
+/* Left panel */
+.left {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 24px;
+  background: var(--cream);
+}
+.leftContent {
+  width: 100%;
+  max-width: 400px;
+}
+.logo {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-display);
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--chocolate);
+  text-decoration: none;
+  margin-bottom: 36px;
+}
+.leftTitle {
+  font-size: 32px;
+  font-weight: 400;
+  color: var(--chocolate);
+  margin-bottom: 8px;
+}
+.leftSub {
+  font-size: 15px;
+  color: var(--gray-500);
+  margin-bottom: 32px;
+}
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.formActions {
+  display: flex;
+  gap: 12px;
+  margin-top: 4px;
+}
+.switchLink {
+  margin-top: 24px;
+  font-size: 14px;
+  color: var(--gray-500);
+  text-align: center;
+}
+.switchLink a {
+  color: var(--rose);
+  text-decoration: none;
+  font-weight: 500;
+}
+.switchLink a:hover { text-decoration: underline; }
+
+/* Demo box */
+.demoBox {
+  margin-top: 24px;
+  padding: 16px;
+  background: var(--caramel-light);
+  border-radius: var(--radius);
+  border: 1px solid var(--caramel);
+}
+.demoTitle {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--caramel);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 10px;
+}
+.demoRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 12px;
+  margin-bottom: 6px;
+  gap: 8px;
+}
+.demoRow span { color: var(--chocolate-mid); font-weight: 500; white-space: nowrap; }
+.demoRow code {
+  font-size: 11px;
+  background: rgba(255,255,255,0.6);
+  padding: 2px 8px;
+  border-radius: 4px;
+  color: var(--chocolate);
+  word-break: break-all;
+}
+
+/* Step indicator */
+.stepIndicator {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  margin-bottom: 28px;
+  width: 80px;
+}
+.stepDot {
+  width: 28px; height: 28px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px; font-weight: 600;
+  background: var(--gray-200); color: var(--gray-400);
+  transition: all 0.2s;
+  flex-shrink: 0;
+}
+.stepActive { background: var(--rose); color: var(--white); }
+.stepLine {
+  flex: 1; height: 2px;
+  background: var(--gray-200);
+}
+
+/* Slug field */
+.slugField {
+  display: flex;
+  align-items: center;
+  border: 1.5px solid var(--gray-200);
+  border-radius: var(--radius);
+  overflow: hidden;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+.slugField:focus-within {
+  border-color: var(--rose);
+  box-shadow: 0 0 0 3px rgba(232,97,74,0.1);
+}
+.slugPrefix {
+  padding: 10px 12px;
+  background: var(--gray-50);
+  font-size: 12px;
+  color: var(--gray-400);
+  white-space: nowrap;
+  border-right: 1px solid var(--gray-200);
+  font-family: monospace;
+}
+.slugInput {
+  border: none !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  flex: 1;
+}
+
+/* Right panel */
+.right {
+  background: var(--chocolate);
+  background-image:
+    radial-gradient(ellipse at 20% 80%, rgba(200,132,58,0.2) 0%, transparent 60%),
+    radial-gradient(ellipse at 80% 20%, rgba(232,97,74,0.15) 0%, transparent 50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+}
+.rightDecor {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+.bigEmoji {
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 120px;
+  opacity: 0.12;
+  pointer-events: none;
+  user-select: none;
+}
+.floatCard {
+  position: absolute;
+  background: rgba(255,255,255,0.08);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: var(--radius);
+  padding: 12px 18px;
+  font-size: 13px;
+  color: rgba(255,255,255,0.85);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  animation: floatUp 4s ease-in-out infinite alternate;
+}
+.floatCard:nth-child(2) { animation-delay: 1.5s; }
+.floatCard:nth-child(3) { animation-delay: 3s; }
+.floatCard span { font-size: 16px; }
+
+@keyframes floatUp {
+  0% { transform: translateY(0px); }
+  100% { transform: translateY(-8px); }
+}
