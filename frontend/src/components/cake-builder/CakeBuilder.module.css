@@ -2,7 +2,7 @@
 
 /* Step nav */
 .stepNav {
-  display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 20px;
+  display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 20px; justify-content: center;
 }
 .stepPill {
   display: flex; align-items: center; gap: 6px;
