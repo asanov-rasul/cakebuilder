@@ -6,15 +6,22 @@ import styles from './Cake3DViewer.module.css';
 /* ── Colour palettes ─────────────────────────────────────────────────────── */
 const FILLING_COLORS = {
   'Chocolate': { base: 0x2e1006, mid: 0x5c2210, light: 0x9b5a30 },
+  'Шоколад':   { base: 0x2e1006, mid: 0x5c2210, light: 0x9b5a30 },
   'Vanilla':   { base: 0xf0d878, mid: 0xf5e498, light: 0xfdf5cc },
+  'Ваниль':    { base: 0xf0d878, mid: 0xf5e498, light: 0xfdf5cc },
   'Strawberry':{ base: 0xc0182c, mid: 0xe03050, light: 0xff7090 },
+  'Клубника':  { base: 0xc0182c, mid: 0xe03050, light: 0xff7090 },
   'Red Velvet':{ base: 0x7a0000, mid: 0x9a0808, light: 0xc01818 },
+  'Красный бархат': { base: 0x7a0000, mid: 0x9a0808, light: 0xc01818 },
   default:     { base: 0xb07840, mid: 0xd09a60, light: 0xe8c080 },
 };
 const CREAM_COLORS = {
   'Buttercream':     { top: 0xfff5dc, side: 0xffeebb, drip: 0xffd980 },
+  'Сливочный крем':  { top: 0xfff5dc, side: 0xffeebb, drip: 0xffd980 },
   'Chocolate Cream': { top: 0x2a0e04, side: 0x3d1608, drip: 0x1a0803 },
+  'Шоколадный крем': { top: 0x2a0e04, side: 0x3d1608, drip: 0x1a0803 },
   'Vanilla Cream':   { top: 0xfffce8, side: 0xfff7c8, drip: 0xffee88 },
+  'Ванильный крем':  { top: 0xfffce8, side: 0xfff7c8, drip: 0xffee88 },
   default:           { top: 0xfff5dc, side: 0xffeebb, drip: 0xffd980 },
 };
 
@@ -395,7 +402,7 @@ function buildCake(scene, state) {
 
   if (decorations && decorations.length > 0) {
     decorations.forEach(({ name = '' }) => {
-      if (name.includes('Fruit') || name.includes('Fresh')) {
+      if (name.includes('Fruit') || name.includes('Fresh') || name.includes('фрукт') || name.includes('Фрукт')) {
         for (let i = 0; i < 5; i++) {
           const a = (i/5)*Math.PI*2 + Math.random()*.3, rr = (.25+Math.random()*.55)*(radius-.06);
           addStrawberry(group, Math.cos(a)*rr, decoSurfY, Math.sin(a)*rr);
@@ -404,7 +411,7 @@ function buildCake(scene, state) {
           const a = Math.random()*Math.PI*2, rr = .1+Math.random()*(radius-.13);
           addOrangeSlice(group, Math.cos(a)*rr, decoSurfY, Math.sin(a)*rr);
         }
-      } else if (name.includes('Berr')) {
+      } else if (name.includes('Berr') || name.includes('год') || name.includes('Яго')) {
         for (let i = 0; i < 16; i++) {
           const a = Math.random()*Math.PI*2, rr = Math.random()*(radius-.05);
           addBlueberry(group, Math.cos(a)*rr, decoSurfY, Math.sin(a)*rr);
@@ -413,7 +420,7 @@ function buildCake(scene, state) {
           const a = Math.random()*Math.PI*2, rr = .08+Math.random()*(radius-.13);
           addStrawberry(group, Math.cos(a)*rr, decoSurfY, Math.sin(a)*rr);
         }
-      } else if (name.includes('Chocolate')) {
+      } else if (name.includes('Chocolate') || name.includes('шоколад') || name.includes('Шоколад')) {
         addChocolateShards(group, decoSurfY, radius, 9);
         for (let i = 0; i < 10; i++) {
           const a = Math.random()*Math.PI*2, rr = Math.random()*(radius-.04), R = 0.020;
@@ -422,7 +429,7 @@ function buildCake(scene, state) {
           ball.position.set(Math.cos(a)*rr, decoSurfY + R, Math.sin(a)*rr);
           ball.userData.isCake = true; group.add(ball);
         }
-      } else if (name.includes('Figure') || name.includes('Custom')) {
+      } else if (name.includes('Figure') || name.includes('Custom') || name.includes('игурк') || name.includes('Фигур')) {
         const fc = [0xff6b9d, 0xffd166, 0x06d6a0, 0x118ab2];
         for (let i = 0; i < 4; i++) {
           const a = (i/4)*Math.PI*2+.4, rr = (radius-.1)*.62;
