@@ -156,8 +156,8 @@ BEGIN
   IF shop_id IS NOT NULL THEN
     -- Shapes
     INSERT INTO shop_shapes (shop_id, name, slug, price_modifier, sort_order) VALUES
-    (shop_id, 'Round', 'round', 0, 1),
-    (shop_id, 'Square', 'square', 2, 2),
+    (shop_id, 'Круглый', 'round', 0, 1),
+    (shop_id, 'Квадратный', 'square', 2, 2),
     -- Heart shape removed
 
     -- Sizes
