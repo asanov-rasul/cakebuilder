@@ -401,8 +401,10 @@ function buildCake(scene, state) {
   const decoSurfY = creamTopY;
 
   if (decorations && decorations.length > 0) {
-    decorations.forEach(({ name = '' }) => {
-      if (name.includes('Fruit') || name.includes('Fresh') || name.includes('фрукт') || name.includes('Фрукт')) {
+    decorations.forEach((deco) => {
+      const name = (deco.name || '').toLowerCase();
+      console.log('[3D] decoration name:', deco.name, '→', name);
+      if (name.includes('fruit') || name.includes('fresh') || name.includes('фрукт')) {
         for (let i = 0; i < 5; i++) {
           const a = (i/5)*Math.PI*2 + Math.random()*.3, rr = (.25+Math.random()*.55)*(radius-.06);
           addStrawberry(group, Math.cos(a)*rr, decoSurfY, Math.sin(a)*rr);
@@ -411,7 +413,7 @@ function buildCake(scene, state) {
           const a = Math.random()*Math.PI*2, rr = .1+Math.random()*(radius-.13);
           addOrangeSlice(group, Math.cos(a)*rr, decoSurfY, Math.sin(a)*rr);
         }
-      } else if (name.includes('Berr') || name.includes('год') || name.includes('Яго')) {
+      } else if (name.includes('berr') || name.includes('ягод')) {
         for (let i = 0; i < 16; i++) {
           const a = Math.random()*Math.PI*2, rr = Math.random()*(radius-.05);
           addBlueberry(group, Math.cos(a)*rr, decoSurfY, Math.sin(a)*rr);
@@ -420,7 +422,7 @@ function buildCake(scene, state) {
           const a = Math.random()*Math.PI*2, rr = .08+Math.random()*(radius-.13);
           addStrawberry(group, Math.cos(a)*rr, decoSurfY, Math.sin(a)*rr);
         }
-      } else if (name.includes('Chocolate') || name.includes('шоколад') || name.includes('Шоколад')) {
+      } else if (name.includes('chocolate') || name.includes('шоколад')) {
         addChocolateShards(group, decoSurfY, radius, 9);
         for (let i = 0; i < 10; i++) {
           const a = Math.random()*Math.PI*2, rr = Math.random()*(radius-.04), R = 0.020;
@@ -429,7 +431,7 @@ function buildCake(scene, state) {
           ball.position.set(Math.cos(a)*rr, decoSurfY + R, Math.sin(a)*rr);
           ball.userData.isCake = true; group.add(ball);
         }
-      } else if (name.includes('Figure') || name.includes('Custom') || name.includes('игурк') || name.includes('Фигур')) {
+      } else if (name.includes('figure') || name.includes('custom') || name.includes('фигур')) {
         const fc = [0xff6b9d, 0xffd166, 0x06d6a0, 0x118ab2];
         for (let i = 0; i < 4; i++) {
           const a = (i/4)*Math.PI*2+.4, rr = (radius-.1)*.62;
