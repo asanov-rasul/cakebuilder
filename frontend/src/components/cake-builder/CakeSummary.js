@@ -1,18 +1,21 @@
 import React from 'react';
 import useCakeStore from '../../store/cakeStore';
+import { useLang } from '../../i18n';
 import styles from './CakeSummary.module.css';
 
 export default function CakeSummary() {
   const { shape, size, filling, cream, decorations, cakeText, calculatePrice } = useCakeStore();
+  const { t } = useLang();
+  const B = t.builder;
   const price = calculatePrice();
 
   const rows = [
-    { label: 'Форма', value: shape?.name, emoji: '🔵' },
-    { label: 'Размер', value: size ? `${size.weight_kg} кг` : null, emoji: '⚖️' },
-    { label: 'Начинка', value: filling?.name, emoji: '🍫' },
-    { label: 'Крем', value: cream?.name, emoji: '🧁' },
-    { label: 'Украшения', value: decorations.length ? decorations.map(d => d.name).join(', ') : null, emoji: '🍓' },
-    { label: 'Надпись', value: cakeText || null, emoji: '✍️' },
+    { label: B.shapeLabel,   value: shape?.name,   emoji: '🔵' },
+    { label: B.sizeLabel,    value: size ? `${size.weight_kg} kg` : null, emoji: '⚖️' },
+    { label: B.fillingLabel, value: filling?.name,  emoji: '🍫' },
+    { label: B.creamLabel,   value: cream?.name,    emoji: '🧁' },
+    { label: B.decorLabel,   value: decorations.length ? decorations.map(d => d.name).join(', ') : null, emoji: '🍓' },
+    { label: B.textSummaryLabel, value: cakeText || null, emoji: '✍️' },
   ].filter(r => r.value);
 
   if (!rows.length) return null;
@@ -21,7 +24,7 @@ export default function CakeSummary() {
     <div className={styles.summary}>
       <div className={styles.header}>
         <span>🎂</span>
-        <span>Your cake so far</span>
+        <span>{B.yourCakeSoFar}</span>
       </div>
       <div className={styles.rows}>
         {rows.map(r => (
@@ -33,8 +36,8 @@ export default function CakeSummary() {
         ))}
       </div>
       <div className={styles.total}>
-        <span>Total</span>
-        <span className={styles.totalPrice}>${price.toFixed(2)}</span>
+        <span>{t.common.total}</span>
+        <span className={styles.totalPrice}>{price.toFixed(2)} TMT</span>
       </div>
     </div>
   );
