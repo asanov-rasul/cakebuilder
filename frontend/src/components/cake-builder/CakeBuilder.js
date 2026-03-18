@@ -7,16 +7,14 @@ import StepCream from './StepCream';
 import StepDecorations from './StepDecorations';
 import StepText from './StepText';
 import Cake3DViewer from './Cake3DViewer';
-import { useLang } from '../../i18n';
 import styles from './CakeBuilder.module.css';
 
+const STEP_LABELS = ['Форма', 'Размер', 'Начинка', 'Крем', 'Украшения', 'Надпись'];
 const STEP_EMOJIS = ['🔵', '⚖️', '🍫', '🧁', '🍓', '✍️'];
 const BUILDER_STEPS = 6;
 
 export default function CakeBuilder({ config }) {
   const { step, nextStep, prevStep, goToStep, isStepComplete, calculatePrice } = useCakeStore();
-  const { t } = useLang();
-  const B = t.builder;
 
   const canNext = isStepComplete(step);
   const price = calculatePrice();
@@ -36,8 +34,9 @@ export default function CakeBuilder({ config }) {
 
   return (
     <div className={styles.wrap}>
+      {/* Step nav pills */}
       <div className={styles.stepNav}>
-        {B.steps.map((label, i) => {
+        {STEP_LABELS.map((label, i) => {
           const n = i + 1;
           const isActive = n === step;
           const isDone = n < step;
@@ -55,36 +54,40 @@ export default function CakeBuilder({ config }) {
         })}
       </div>
 
+      {/* Two-column layout: 3D viewer | step content */}
       <div className={styles.mainLayout}>
+
+        {/* LEFT: 3D cake viewer — sticky */}
         <div className={styles.viewerCol}>
           <Cake3DViewer />
           <div className={styles.priceTag}>
-            <span className={styles.priceTagLabel}>{B.yourCake}</span>
-            <span className={styles.priceTagValue}>{price.toFixed(2)} TMT</span>
+            <span className={styles.priceTagLabel}>Your cake</span>
+            <span className={styles.priceTagValue}>${price.toFixed(2)}</span>
           </div>
         </div>
 
+        {/* RIGHT: step content + nav */}
         <div className={styles.stepCol}>
           <div className={styles.stepContent}>
             <div className={styles.stepHeader}>
               <h2 className={styles.stepTitle}>
-                {STEP_EMOJIS[step - 1]}&nbsp;{B.steps[step - 1]}
+                {STEP_EMOJIS[step - 1]}&nbsp;{STEP_LABELS[step - 1]}
               </h2>
-              {step >= 4 && <span className={styles.optionalTag}>{B.optional}</span>}
+              {step >= 4 && <span className={styles.optionalTag}>Optional</span>}
             </div>
             {renderStep()}
           </div>
 
           <div className={styles.navBtns}>
             {step > 1 && (
-              <button className="btn btn-outline" onClick={prevStep}>{B.back}</button>
+              <button className="btn btn-outline" onClick={prevStep}>← Back</button>
             )}
             <button
               className="btn btn-primary"
               onClick={nextStep}
               disabled={step <= 2 && !canNext}
             >
-              {isLastBuilderStep ? B.reviewOrder : B.continue}
+              {isLastBuilderStep ? '📋 Оформить заказ →' : 'Продолжить →'}
             </button>
           </div>
         </div>

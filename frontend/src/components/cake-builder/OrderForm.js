@@ -2,15 +2,12 @@ import React, { useState } from 'react';
 import { toast } from 'react-hot-toast';
 import useCakeStore from '../../store/cakeStore';
 import { orderAPI } from '../../utils/api';
-import { useLang } from '../../i18n';
 import styles from './OrderForm.module.css';
 
 export default function OrderForm({ shopId, shopName, onOrderPlaced, onBack }) {
-  const { shape, size, filling, cream, decorations, cakeText, calculatePrice, getCakeConfig } = useCakeStore();
+  const { shape, size, filling, cream, decorations, cakeText, calculatePrice, getCakeConfig, reset } = useCakeStore();
   const [form, setForm] = useState({ customer_name: '', customer_phone: '', delivery_date: '', delivery_time: '', comment: '' });
   const [loading, setLoading] = useState(false);
-  const { t } = useLang();
-  const O = t.order;
   const price = calculatePrice();
   const config = getCakeConfig();
 
@@ -40,7 +37,7 @@ export default function OrderForm({ shopId, shopName, onOrderPlaced, onBack }) {
       });
       onOrderPlaced(res.data);
     } catch (err) {
-      toast.error(err.response?.data?.error || O.errorPlace);
+      toast.error(err.response?.data?.error || 'Не удалось оформить заказ');
     } finally {
       setLoading(false);
     }
@@ -48,16 +45,17 @@ export default function OrderForm({ shopId, shopName, onOrderPlaced, onBack }) {
 
   return (
     <div className={styles.wrap}>
+      {/* Summary */}
       <div className={styles.summaryCard}>
-        <h3 className={styles.summaryTitle}>{O.summary}</h3>
+        <h3 className={styles.summaryTitle}>Your cake summary</h3>
         <div className={styles.summaryGrid}>
           {[
-            { l: O.shape,       v: shape?.name },
-            { l: O.size,        v: size ? `${size.weight_kg} kg` : '—' },
-            { l: O.filling,     v: filling?.name || '—' },
-            { l: O.cream,       v: cream?.name || '—' },
-            { l: O.decorations, v: decorations.length ? decorations.map(d => d.name).join(', ') : O.none },
-            { l: O.text,        v: cakeText || O.none },
+            { l: 'Форма', v: shape?.name },
+            { l: 'Размер', v: size ? `${size.weight_kg} кг` : '—' },
+            { l: 'Начинка', v: filling?.name || '—' },
+            { l: 'Крем', v: cream?.name || '—' },
+            { l: 'Украшения', v: decorations.length ? decorations.map(d => d.name).join(', ') : 'Нет' },
+            { l: 'Надпись', v: cakeText || 'Нет' },
           ].map(r => (
             <div key={r.l} className={styles.summaryRow}>
               <span className={styles.summaryLabel}>{r.l}</span>
@@ -66,23 +64,24 @@ export default function OrderForm({ shopId, shopName, onOrderPlaced, onBack }) {
           ))}
         </div>
         <div className={styles.summaryTotal}>
-          <span>{O.totalPrice}</span>
-          <span className={styles.summaryTotalPrice}>{price.toFixed(2)} TMT</span>
+          <span>Total price</span>
+          <span className={styles.summaryTotalPrice}>${price.toFixed(2)}</span>
         </div>
       </div>
 
+      {/* Form */}
       <div className={styles.formCard}>
-        <h3 className={styles.formTitle}>{O.deliveryTitle}</h3>
+        <h3 className={styles.formTitle}>Delivery details</h3>
         <form onSubmit={handleSubmit} className={styles.form}>
           <div className={styles.formRow}>
             <div className="form-group">
-              <label className="form-label">{O.yourName}</label>
+              <label className="form-label">Your name *</label>
               <input className="form-input" type="text" required placeholder="Анна Иванова"
                 value={form.customer_name}
                 onChange={e => setForm({ ...form, customer_name: e.target.value })} />
             </div>
             <div className="form-group">
-              <label className="form-label">{O.phone}</label>
+              <label className="form-label">Phone number *</label>
               <input className="form-input" type="tel" required placeholder="+7 999 000-00-00"
                 value={form.customer_phone}
                 onChange={e => setForm({ ...form, customer_phone: e.target.value })} />
@@ -90,30 +89,31 @@ export default function OrderForm({ shopId, shopName, onOrderPlaced, onBack }) {
           </div>
           <div className={styles.formRow}>
             <div className="form-group">
-              <label className="form-label">{O.deliveryDate}</label>
+              <label className="form-label">Delivery date</label>
               <input className="form-input" type="date" min={minDate}
                 value={form.delivery_date}
                 onChange={e => setForm({ ...form, delivery_date: e.target.value })} />
             </div>
             <div className="form-group">
-              <label className="form-label">{O.deliveryTime}</label>
+              <label className="form-label">Delivery time</label>
               <input className="form-input" type="time"
                 value={form.delivery_time}
                 onChange={e => setForm({ ...form, delivery_time: e.target.value })} />
             </div>
           </div>
           <div className="form-group">
-            <label className="form-label">{O.notes}</label>
-            <textarea className="form-input" placeholder={O.notesPlaceholder}
+            <label className="form-label">Additional notes (optional)</label>
+            <textarea className="form-input" placeholder="Особые пожелания или аллергии..."
               value={form.comment}
               onChange={e => setForm({ ...form, comment: e.target.value })} />
           </div>
+
           <div className={styles.formFooter}>
             <button type="button" className="btn btn-ghost" onClick={onBack || (() => window.history.back())}>
-              {O.editCake}
+              ← Edit cake
             </button>
             <button type="submit" className="btn btn-primary btn-lg" disabled={loading}>
-              {loading ? <span className="spinner" /> : `${O.placeOrder} · ${price.toFixed(2)} TMT`}
+              {loading ? <span className="spinner" /> : `Оформить заказ · ${price.toFixed(2)} ₸`}
             </button>
           </div>
         </form>
