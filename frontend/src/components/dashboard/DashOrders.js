@@ -162,7 +162,7 @@ export default function DashOrders() {
       // Notify of new orders since last poll
       if (prevCountRef.current !== null && newTotal > prevCountRef.current && statusFilter === '') {
         const diff = newTotal - prevCountRef.current;
-        toast.success(`🔔 ${diff} новый заказ${} получен!`, { duration: 5000 });
+        toast.success(`🔔 ${diff} новых заказа получено!`, { duration: 5000 });
       }
       prevCountRef.current = newTotal;
 
