@@ -251,7 +251,7 @@ function buildCake(scene, state) {
   const kg = size ? parseFloat(size.weight_kg) : 1;
 
   const sn = (shape?.slug || shape?.name || 'round').toLowerCase();
-  const isSquare = sn === 'square';
+  const isSquare = sn === 'Квадрат';
   const radius = isSquare ? 0.30 + kg * 0.055 : 0.33 + kg * 0.11;
   const layerH = 0.16 + kg * 0.024;
   const layers = Math.round(1 + kg * 0.8);
