@@ -1,7 +1,12 @@
 import React from 'react';
 import useCakeStore from '../../store/cakeStore';
-import { useLang } from '../../i18n';
 import styles from './Steps.module.css';
+
+// Русские названия по slug/name
+const SHAPE_NAMES   = { round: 'Круглый', circle: 'Круглый', square: 'Квадратный' };
+const FILLING_NAMES = { Chocolate: 'Шоколад', Vanilla: 'Ваниль', Strawberry: 'Клубника', 'Red Velvet': 'Красный бархат' };
+const CREAM_NAMES   = { Buttercream: 'Сливочный крем', 'Chocolate Cream': 'Шоколадный крем', 'Vanilla Cream': 'Ванильный крем' };
+const DECO_NAMES    = { 'Fresh Fruits': 'Свежие фрукты', Berries: 'Ягоды', 'Chocolate Pieces': 'Кусочки шоколада', 'Custom Figures': 'Фигурки' };
 
 function OptionCard({ emoji, label, sublabel, selected, onClick, badge }) {
   return (
@@ -19,19 +24,20 @@ function OptionCard({ emoji, label, sublabel, selected, onClick, badge }) {
   );
 }
 
+// Шаг 1: Форма — только круг и квадрат
 export function StepShape({ shapes }) {
   const { shape, setShape } = useCakeStore();
-  const { t } = useLang();
-  const shapeEmojis = { round: '⭕', circle: '⭕', square: '⬛', heart: '❤️' };
+  const shapeEmojis = { round: '⭕', circle: '⭕', square: '⬛' };
+  const allowed = shapes.filter(s => s.slug === 'round' || s.slug === 'square' || s.slug === 'circle');
 
   return (
     <div className={styles.grid3}>
-      {shapes.map((s) => (
+      {allowed.map((s) => (
         <OptionCard
           key={s.id}
           emoji={shapeEmojis[s.slug] || '🔵'}
-          label={s.name}
-          sublabel={parseFloat(s.price_modifier) > 0 ? `+${s.price_modifier} TMT` : t.builder.included}
+          label={SHAPE_NAMES[s.slug] || s.name}
+          sublabel={parseFloat(s.price_modifier) > 0 ? `+${s.price_modifier} ₸` : 'Включено'}
           selected={shape?.id === s.id}
           onClick={() => setShape(s)}
         />
@@ -40,14 +46,14 @@ export function StepShape({ shapes }) {
   );
 }
 
+// Шаг 2: Размер
 export function StepSize({ sizes, pricePerKg }) {
   const { size, setSize } = useCakeStore();
-  const { t } = useLang();
   const base = parseFloat(pricePerKg) || 15;
 
   return (
     <div>
-      <p className={styles.stepHint}>{t.builder.sizeHint}</p>
+      <p className={styles.stepHint}>Цена = базовая ставка × размер × форма</p>
       <div className={styles.grid3}>
         {sizes.map((s) => {
           const price = (base * parseFloat(s.weight_kg) * parseFloat(s.price_multiplier)).toFixed(2);
@@ -55,11 +61,11 @@ export function StepSize({ sizes, pricePerKg }) {
             <OptionCard
               key={s.id}
               emoji={s.weight_kg <= 1 ? '🍰' : s.weight_kg <= 2 ? '🎂' : '🎆'}
-              label={`${s.weight_kg} kg`}
-              sublabel={`${t.builder.from} ${price} TMT`}
+              label={`${s.weight_kg} кг`}
+              sublabel={`от ${price} ₸`}
               selected={size?.id === s.id}
               onClick={() => setSize(s)}
-              badge={s.weight_kg === 2 ? t.builder.popular : null}
+              badge={s.weight_kg === 2 ? 'Популярное' : null}
             />
           );
         })}
@@ -68,9 +74,9 @@ export function StepSize({ sizes, pricePerKg }) {
   );
 }
 
+// Шаг 3: Начинка
 export function StepFilling({ fillings }) {
   const { filling, setFilling } = useCakeStore();
-  const { t } = useLang();
   const fillingEmojis = { Chocolate: '🍫', Vanilla: '🤍', Strawberry: '🍓', 'Red Velvet': '❤️' };
 
   return (
@@ -79,8 +85,8 @@ export function StepFilling({ fillings }) {
         <OptionCard
           key={f.id}
           emoji={fillingEmojis[f.name] || '🎂'}
-          label={f.name}
-          sublabel={parseFloat(f.price_modifier) > 0 ? `+${f.price_modifier} TMT` : t.builder.included}
+          label={FILLING_NAMES[f.name] || f.name}
+          sublabel={parseFloat(f.price_modifier) > 0 ? `+${f.price_modifier} ₸` : 'Включено'}
           selected={filling?.id === f.id}
           onClick={() => setFilling(f)}
         />
@@ -89,9 +95,9 @@ export function StepFilling({ fillings }) {
   );
 }
 
+// Шаг 4: Крем
 export function StepCream({ creams }) {
   const { cream, setCream } = useCakeStore();
-  const { t } = useLang();
   const creamEmojis = { Buttercream: '🧈', 'Chocolate Cream': '🍫', 'Vanilla Cream': '🤍' };
 
   return (
@@ -100,8 +106,8 @@ export function StepCream({ creams }) {
         <OptionCard
           key={c.id}
           emoji={creamEmojis[c.name] || '🧁'}
-          label={c.name}
-          sublabel={parseFloat(c.price_modifier) > 0 ? `+${c.price_modifier} TMT` : t.builder.included}
+          label={CREAM_NAMES[c.name] || c.name}
+          sublabel={parseFloat(c.price_modifier) > 0 ? `+${c.price_modifier} ₸` : 'Включено'}
           selected={cream?.id === c.id}
           onClick={() => setCream(c)}
         />
@@ -110,14 +116,14 @@ export function StepCream({ creams }) {
   );
 }
 
+// Шаг 5: Украшения
 export function StepDecorations({ decorations }) {
   const { decorations: selected, toggleDecoration } = useCakeStore();
-  const { t } = useLang();
   const decorEmojis = { 'Fresh Fruits': '🍊', Berries: '🫐', 'Chocolate Pieces': '🍫', 'Custom Figures': '🎭' };
 
   return (
     <div>
-      <p className={styles.stepHint}>{t.builder.decorHint}</p>
+      <p className={styles.stepHint}>Выберите несколько или пропустите этот шаг</p>
       <div className={styles.grid2}>
         {decorations.map((d) => {
           const isSelected = selected.some((s) => s.id === d.id);
@@ -125,8 +131,8 @@ export function StepDecorations({ decorations }) {
             <OptionCard
               key={d.id}
               emoji={decorEmojis[d.name] || '✨'}
-              label={d.name}
-              sublabel={`+${parseFloat(d.price).toFixed(2)} TMT`}
+              label={DECO_NAMES[d.name] || d.name}
+              sublabel={`+${parseFloat(d.price).toFixed(2)} ₸`}
               selected={isSelected}
               onClick={() => toggleDecoration(d)}
             />
@@ -137,24 +143,24 @@ export function StepDecorations({ decorations }) {
   );
 }
 
+// Шаг 6: Надпись
 export function StepText() {
   const { cakeText, setCakeText } = useCakeStore();
-  const { t } = useLang();
 
   return (
     <div className={styles.textStep}>
-      <p className={styles.stepHint}>{t.builder.textHint}</p>
+      <p className={styles.stepHint}>Добавьте надпись на торт — или оставьте пустым</p>
       <div className={styles.textPreview}>
         <div className={styles.cakePreviewBg}>🎂</div>
         {cakeText && <div className={styles.cakeTextOverlay}>"{cakeText}"</div>}
       </div>
       <div className="form-group mt-4">
-        <label className="form-label">{t.builder.textLabel}</label>
+        <label className="form-label">Надпись на торте</label>
         <input
           className="form-input"
           type="text"
           maxLength={40}
-          placeholder={t.builder.textPlaceholder}
+          placeholder='Например: "С Днём Рождения! 🎉"'
           value={cakeText}
           onChange={(e) => setCakeText(e.target.value)}
         />
