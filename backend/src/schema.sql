@@ -169,21 +169,21 @@ BEGIN
     -- Fillings
     INSERT INTO shop_fillings (shop_id, name, price_modifier, sort_order) VALUES
     (shop_id, 'Chocolate', 3, 1),
-    (shop_id, 'Vanilla', 0, 2),
-    (shop_id, 'Strawberry', 2, 3),
-    (shop_id, 'Red Velvet', 4, 4);
+    (shop_id, 'Ваниль', 0, 2),
+    (shop_id, 'Клубника', 2, 3),
+    (shop_id, 'Красный бархат', 4, 4);
 
     -- Creams
     INSERT INTO shop_creams (shop_id, name, price_modifier, sort_order) VALUES
-    (shop_id, 'Buttercream', 0, 1),
-    (shop_id, 'Chocolate Cream', 3, 2),
-    (shop_id, 'Vanilla Cream', 2, 3);
+    (shop_id, 'Сливочный крем', 0, 1),
+    (shop_id, 'Шоколадный крем', 3, 2),
+    (shop_id, 'Ванильный крем', 2, 3);
 
     -- Decorations
     INSERT INTO shop_decorations (shop_id, name, price, sort_order) VALUES
-    (shop_id, 'Fresh Fruits', 8, 1),
-    (shop_id, 'Berries', 6, 2),
-    (shop_id, 'Chocolate Pieces', 5, 3),
+    (shop_id, 'Свежие фрукты', 8, 1),
+    (shop_id, 'Ягоды', 6, 2),
+    (shop_id, 'Шоколадные кусочки', 5, 3),
     (shop_id, 'Custom Figures', 15, 4);
   END IF;
 END;
