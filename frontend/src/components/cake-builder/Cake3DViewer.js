@@ -5,23 +5,23 @@ import styles from './Cake3DViewer.module.css';
 
 /* ── Colour palettes ─────────────────────────────────────────────────────── */
 const FILLING_COLORS = {
-  'Chocolate': { base: 0x2e1006, mid: 0x5c2210, light: 0x9b5a30 },
-  'Шоколад':   { base: 0x2e1006, mid: 0x5c2210, light: 0x9b5a30 },
-  'Vanilla':   { base: 0xf0d878, mid: 0xf5e498, light: 0xfdf5cc },
-  'Ваниль':    { base: 0xf0d878, mid: 0xf5e498, light: 0xfdf5cc },
-  'Strawberry':{ base: 0xc0182c, mid: 0xe03050, light: 0xff7090 },
-  'Клубника':  { base: 0xc0182c, mid: 0xe03050, light: 0xff7090 },
-  'Red Velvet':{ base: 0x7a0000, mid: 0x9a0808, light: 0xc01818 },
+  'Шоколад':        { base: 0x2e1006, mid: 0x5c2210, light: 0x9b5a30 },
+  'Ваниль':         { base: 0xf0d878, mid: 0xf5e498, light: 0xfdf5cc },
+  'Клубника':       { base: 0xc0182c, mid: 0xe03050, light: 0xff7090 },
   'Красный бархат': { base: 0x7a0000, mid: 0x9a0808, light: 0xc01818 },
+  'Chocolate': { base: 0x2e1006, mid: 0x5c2210, light: 0x9b5a30 },
+  'Vanilla':   { base: 0xf0d878, mid: 0xf5e498, light: 0xfdf5cc },
+  'Strawberry':{ base: 0xc0182c, mid: 0xe03050, light: 0xff7090 },
+  'Red Velvet':{ base: 0x7a0000, mid: 0x9a0808, light: 0xc01818 },
   default:     { base: 0xb07840, mid: 0xd09a60, light: 0xe8c080 },
 };
 const CREAM_COLORS = {
-  'Buttercream':     { top: 0xfff5dc, side: 0xffeebb, drip: 0xffd980 },
   'Сливочный крем':  { top: 0xfff5dc, side: 0xffeebb, drip: 0xffd980 },
-  'Chocolate Cream': { top: 0x2a0e04, side: 0x3d1608, drip: 0x1a0803 },
   'Шоколадный крем': { top: 0x2a0e04, side: 0x3d1608, drip: 0x1a0803 },
-  'Vanilla Cream':   { top: 0xfffce8, side: 0xfff7c8, drip: 0xffee88 },
   'Ванильный крем':  { top: 0xfffce8, side: 0xfff7c8, drip: 0xffee88 },
+  'Buttercream':     { top: 0xfff5dc, side: 0xffeebb, drip: 0xffd980 },
+  'Chocolate Cream': { top: 0x2a0e04, side: 0x3d1608, drip: 0x1a0803 },
+  'Vanilla Cream':   { top: 0xfffce8, side: 0xfff7c8, drip: 0xffee88 },
   default:           { top: 0xfff5dc, side: 0xffeebb, drip: 0xffd980 },
 };
 
@@ -251,7 +251,7 @@ function buildCake(scene, state) {
   const kg = size ? parseFloat(size.weight_kg) : 1;
 
   const sn = (shape?.slug || shape?.name || 'round').toLowerCase();
-  const isSquare = sn === 'square';
+  const isSquare = sn === 'square' || sn === 'квадратный' || sn === 'квадрат';
   const radius = isSquare ? 0.30 + kg * 0.055 : 0.33 + kg * 0.11;
   const layerH = 0.16 + kg * 0.024;
   const layers = Math.round(1 + kg * 0.8);
@@ -403,7 +403,6 @@ function buildCake(scene, state) {
   if (decorations && decorations.length > 0) {
     decorations.forEach((deco) => {
       const name = (deco.name || '').toLowerCase();
-      console.log('[3D] decoration name:', deco.name, '→', name);
       if (name.includes('fruit') || name.includes('fresh') || name.includes('фрукт')) {
         for (let i = 0; i < 5; i++) {
           const a = (i/5)*Math.PI*2 + Math.random()*.3, rr = (.25+Math.random()*.55)*(radius-.06);
