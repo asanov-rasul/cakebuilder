@@ -61,7 +61,7 @@ function ColorPicker({ value, onChange, label }) {
       {/* Dropdown palette */}
       {open && (
         <div style={{
-          position: 'absolute', top: 38, right: 0, zIndex: 200,
+          position: 'absolute', top: 38, left: 0, zIndex: 200,
           background: '#fff', border: '1px solid #e5e7eb',
           borderRadius: 14, padding: 14,
           boxShadow: '0 12px 32px rgba(0,0,0,0.14)',
