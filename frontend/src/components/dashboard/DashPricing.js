@@ -60,7 +60,7 @@ export default function DashPricing() {
         <p className={styles.cardDesc}>This is the starting price for a 1kg cake. All sizes multiply from this value.</p>
         <div className={styles.basePriceRow}>
           <div className={styles.inputGroup}>
-            <span className={styles.inputPrefix}>ТМТ</span>
+            <span className={styles.inputPrefix}>$</span>
             <input
               className="form-input"
               type="number" min="1" step="0.5"
@@ -103,7 +103,7 @@ export default function DashPricing() {
                 />
                 <span className={styles.xLabel}>×</span>
               </div>
-              <span className={styles.examplePrice}>ТМТ{calcExample(size)}</span>
+              <span className={styles.examplePrice}>${calcExample(size)}</span>
             </div>
           ))}
         </div>
@@ -122,7 +122,7 @@ export default function DashPricing() {
           <div className={styles.table}>
             <div className={styles.tableHead}>
               <span>Name</span>
-              <span>Extra price (ТМТ)</span>
+              <span>Extra price ($)</span>
             </div>
             {menu[key]?.length === 0 && (
               <div className={styles.emptyRow}>No items — add them in Menu settings</div>
@@ -131,7 +131,7 @@ export default function DashPricing() {
               <div key={item.id} className={`${styles.tableRow} ${!item.is_active ? styles.rowDisabled : ''}`}>
                 <span className={styles.itemName}>{item.name || `${item.weight_kg}kg`}</span>
                 <div className={styles.priceInputGroup}>
-                  <span className={styles.dollarPrefix}>ТМТ</span>
+                  <span className={styles.dollarPrefix}>$</span>
                   <input
                     className="form-input"
                     type="number" min="0" step="0.5"
