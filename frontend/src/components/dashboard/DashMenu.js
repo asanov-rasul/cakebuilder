@@ -20,60 +20,95 @@ const COLOR_PRESETS = [
   '#ffffff', '#fffde7', '#f3f4f6', // white / light
 ];
 
-function ColorPicker({ value, onChange }) {
+function ColorPicker({ value, onChange, label }) {
   const [open, setOpen] = useState(false);
+  const ref = React.useRef(null);
+
+  // Close on outside click
+  React.useEffect(() => {
+    if (!open) return;
+    const handler = (e) => { if (ref.current && !ref.current.contains(e.target)) setOpen(false); };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, [open]);
+
   return (
-    <div style={{ position: 'relative', display: 'inline-block' }}>
+    <div ref={ref} style={{ position: 'relative' }}>
+      {/* Trigger button — color swatch + label */}
       <button
         type="button"
-        title="Цвет в 3D"
         onClick={() => setOpen(o => !o)}
         style={{
-          width: 32, height: 32, borderRadius: 8,
-          background: value || '#d09a60',
-          border: '2px solid #e5e7eb',
-          cursor: 'pointer', flexShrink: 0,
+          display: 'flex', alignItems: 'center', gap: 6,
+          padding: '4px 10px 4px 6px',
+          border: '1.5px solid #e5e7eb', borderRadius: 20,
+          background: '#fff', cursor: 'pointer',
+          fontSize: 12, color: '#6b7280', fontWeight: 500,
+          transition: 'border-color 0.15s',
         }}
-      />
+        onMouseEnter={e => e.currentTarget.style.borderColor = '#e8614a'}
+        onMouseLeave={e => e.currentTarget.style.borderColor = '#e5e7eb'}
+      >
+        <span style={{
+          width: 18, height: 18, borderRadius: 5,
+          background: value || '#d09a60',
+          border: '1px solid rgba(0,0,0,0.1)',
+          display: 'inline-block', flexShrink: 0,
+        }} />
+        🎨 Цвет 3D
+      </button>
+
+      {/* Dropdown palette */}
       {open && (
         <div style={{
-          position: 'absolute', top: 36, left: 0, zIndex: 100,
+          position: 'absolute', top: 38, right: 0, zIndex: 200,
           background: '#fff', border: '1px solid #e5e7eb',
-          borderRadius: 12, padding: 10, boxShadow: '0 8px 24px rgba(0,0,0,0.12)',
-          width: 200,
+          borderRadius: 14, padding: 14,
+          boxShadow: '0 12px 32px rgba(0,0,0,0.14)',
+          width: 220, minWidth: 220,
         }}>
-          <div style={{ fontSize: 11, color: '#9ca3af', marginBottom: 8, fontWeight: 600 }}>
+          <div style={{ fontSize: 12, fontWeight: 600, color: '#374151', marginBottom: 10 }}>
             🎨 Цвет торта в 3D
           </div>
-          {/* Native color input */}
+
+          {/* Native color picker */}
           <input
             type="color"
             value={value || '#d09a60'}
             onChange={e => onChange(e.target.value)}
-            style={{ width: '100%', height: 36, border: 'none', borderRadius: 8, cursor: 'pointer', marginBottom: 8 }}
+            style={{ width: '100%', height: 40, border: 'none', borderRadius: 8,
+              cursor: 'pointer', marginBottom: 10, display: 'block' }}
           />
-          {/* Presets */}
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4 }}>
+
+          {/* Preset chips */}
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 5, marginBottom: 10 }}>
             {COLOR_PRESETS.map(c => (
               <button
                 key={c}
                 type="button"
                 onClick={() => { onChange(c); setOpen(false); }}
                 style={{
-                  width: 24, height: 24, borderRadius: 6,
-                  background: c, border: value === c ? '2px solid #e8614a' : '1px solid #e5e7eb',
-                  cursor: 'pointer',
+                  width: 26, height: 26, borderRadius: 7,
+                  background: c,
+                  border: value === c ? '2.5px solid #e8614a' : '1.5px solid #e5e7eb',
+                  cursor: 'pointer', transition: 'transform 0.1s',
                 }}
+                onMouseEnter={e => e.currentTarget.style.transform = 'scale(1.15)'}
+                onMouseLeave={e => e.currentTarget.style.transform = 'scale(1)'}
               />
             ))}
           </div>
+
           <button
             type="button"
             onClick={() => setOpen(false)}
-            style={{ marginTop: 8, width: '100%', padding: '4px 0', fontSize: 12,
-              border: 'none', background: '#f3f4f6', borderRadius: 6, cursor: 'pointer' }}
+            style={{
+              width: '100%', padding: '6px 0', fontSize: 13,
+              border: 'none', background: '#f9fafb', borderRadius: 8,
+              cursor: 'pointer', color: '#374151', fontWeight: 500,
+            }}
           >
-            Готово
+            Применить
           </button>
         </div>
       )}
@@ -177,18 +212,25 @@ function MenuSection({ sectionKey, label, icon, addLabel, hasColor, items, onAdd
               </div>
             ) : (
               <div className={styles.itemContent}>
-                {hasColor && (
-                  <div style={{
-                    width: 14, height: 14, borderRadius: 4, flexShrink: 0,
-                    background: item.color || '#d09a60',
-                    border: '1px solid #e5e7eb',
-                  }} title="Цвет в 3D" />
-                )}
-                <div className={styles.itemName}>{item.name}</div>
-                <div className={styles.itemPrice}>
-                  {parseFloat(item[priceField] || 0) > 0
-                    ? `+${parseFloat(item[priceField] || 0).toFixed(2)} ТМТ`
-                    : 'Включено'}
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+                    <span className={styles.itemName}>{item.name}</span>
+                    {hasColor && (
+                      <ColorPicker
+                        value={item.color || '#d09a60'}
+                        onChange={async (color) => {
+                          try {
+                            await onEdit(sectionKey, item.id, { color });
+                          } catch {}
+                        }}
+                      />
+                    )}
+                  </div>
+                  <div className={styles.itemPrice}>
+                    {parseFloat(item[priceField] || 0) > 0
+                      ? `+${parseFloat(item[priceField] || 0).toFixed(2)} ТМТ`
+                      : 'Включено'}
+                  </div>
                 </div>
                 <div className={styles.itemActions}>
                   <button className={styles.toggleBtn}
