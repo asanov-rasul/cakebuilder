@@ -118,7 +118,7 @@ router.patch('/my/menu/:type/:id', auth, requireRole('shop_owner'), async (req, 
     const shopRes = await db.query('SELECT id FROM shops WHERE owner_id = $1', [req.user.id]);
     if (!shopRes.rows.length) return res.status(404).json({ error: 'Shop not found' });
     const shopId = shopRes.rows[0].id;
-    const { is_active, name, price_modifier, price, weight_kg, price_multiplier } = req.body;
+    const { is_active, name, price_modifier, price, weight_kg, price_multiplier, color } = req.body;
 
     let result;
     if (req.params.type === 'sizes') {
@@ -146,8 +146,8 @@ router.patch('/my/menu/:type/:id', auth, requireRole('shop_owner'), async (req, 
     } else {
       result = await db.query(
         `UPDATE ${table} SET name=COALESCE($1,name), price_modifier=COALESCE($2,price_modifier),
-         is_active=COALESCE($3,is_active) WHERE id=$4 AND shop_id=$5 RETURNING *`,
-        [name, price_modifier, is_active, req.params.id, shopId]
+         is_active=COALESCE($3,is_active), color=COALESCE($6,color) WHERE id=$4 AND shop_id=$5 RETURNING *`,
+        [name, price_modifier, is_active, req.params.id, shopId, color || null]
       );
     }
     if (!result || !result.rows.length) return res.status(404).json({ error: 'Item not found' });
