@@ -25,6 +25,13 @@ const CREAM_COLORS = {
   default:           { top: 0xfff5dc, side: 0xffeebb, drip: 0xffd980 },
 };
 
+
+// Convert hex color string (#rrggbb) to THREE.js integer
+function hexToInt(hex) {
+  if (!hex || typeof hex !== 'string') return null;
+  return parseInt(hex.replace('#', '0x'), 16);
+}
+
 const snoise = (x, y, s = 1) =>
   Math.sin(x * s * 2.1 + 0.5) * Math.cos(y * s * 1.7 + 1.3) * 0.5;
 
@@ -253,14 +260,28 @@ function buildCake(scene, state) {
   const shapeName = (shape?.name || '').toLowerCase();
   const shapeSlug = (shape?.slug || '').toLowerCase();
   const sn = shapeSlug || shapeName || 'round';
+  console.log('[3D] shape slug:', shape?.slug, 'name:', shape?.name);
   const isSquare = shapeSlug === 'square' || shapeName.includes('квадр') || shapeName === 'square';
   const radius = isSquare ? 0.30 + kg * 0.055 : 0.33 + kg * 0.11;
   const layerH = 0.16 + kg * 0.024;
   const layers = Math.round(1 + kg * 0.8);
   const gapH   = 0.036;
 
-  const fC = FILLING_COLORS[Object.keys(FILLING_COLORS).find(k => filling?.name?.includes(k)) || 'default'];
-  const cC = CREAM_COLORS [Object.keys(CREAM_COLORS) .find(k => cream?.name?.includes(k))   || 'default'];
+  // Use custom color from DB if set, otherwise fall back to palette
+  const fillingCustomColor = filling?.color ? hexToInt(filling.color) : null;
+  const fC_base = FILLING_COLORS[Object.keys(FILLING_COLORS).find(k => filling?.name?.includes(k)) || 'default'];
+  const fC = fillingCustomColor ? {
+    base:  Math.max(0, fillingCustomColor - 0x222222),
+    mid:   fillingCustomColor,
+    light: Math.min(0xffffff, fillingCustomColor + 0x333333),
+  } : fC_base;
+  const creamCustomColor = cream?.color ? hexToInt(cream.color) : null;
+  const cC_base = CREAM_COLORS[Object.keys(CREAM_COLORS).find(k => cream?.name?.includes(k)) || 'default'];
+  const cC = creamCustomColor ? {
+    top:  Math.min(0xffffff, creamCustomColor + 0x111111),
+    side: creamCustomColor,
+    drip: Math.max(0, creamCustomColor - 0x111111),
+  } : cC_base;
 
   /* totalH = height of the bare sponge stack.
      All geometry inside `group` is built with Y = 0 at the GROUP'S base
