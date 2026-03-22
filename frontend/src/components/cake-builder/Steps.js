@@ -37,7 +37,7 @@ export function StepShape({ shapes }) {
           key={s.id}
           emoji={shapeEmojis[s.slug] || '🔵'}
           label={SHAPE_NAMES[s.slug] || s.name}
-          sublabel={parseFloat(s.price_modifier) > 0 ? `+${s.price_modifier} ₸` : 'Включено'}
+          sublabel={parseFloat(s.price_modifier) > 0 ? `+${s.price_modifier} ТМТ` : 'Включено'}
           selected={shape?.id === s.id}
           onClick={() => setShape(s)}
         />
@@ -62,7 +62,7 @@ export function StepSize({ sizes, pricePerKg }) {
               key={s.id}
               emoji={s.weight_kg <= 1 ? '🍰' : s.weight_kg <= 2 ? '🎂' : '🎆'}
               label={`${s.weight_kg} кг`}
-              sublabel={`от ${price} ₸`}
+              sublabel={`от ${price} ТМТ`}
               selected={size?.id === s.id}
               onClick={() => setSize(s)}
               badge={s.weight_kg === 2 ? 'Популярное' : null}
@@ -86,7 +86,7 @@ export function StepFilling({ fillings }) {
           key={f.id}
           emoji={fillingEmojis[f.name] || '🎂'}
           label={FILLING_NAMES[f.name] || f.name}
-          sublabel={parseFloat(f.price_modifier) > 0 ? `+${f.price_modifier} ₸` : 'Включено'}
+          sublabel={parseFloat(f.price_modifier) > 0 ? `+${f.price_modifier} ТМТ` : 'Включено'}
           selected={filling?.id === f.id}
           onClick={() => setFilling(f)}
         />
@@ -107,7 +107,7 @@ export function StepCream({ creams }) {
           key={c.id}
           emoji={creamEmojis[c.name] || '🧁'}
           label={CREAM_NAMES[c.name] || c.name}
-          sublabel={parseFloat(c.price_modifier) > 0 ? `+${c.price_modifier} ₸` : 'Включено'}
+          sublabel={parseFloat(c.price_modifier) > 0 ? `+${c.price_modifier} ТМТ` : 'Включено'}
           selected={cream?.id === c.id}
           onClick={() => setCream(c)}
         />
@@ -132,7 +132,7 @@ export function StepDecorations({ decorations }) {
               key={d.id}
               emoji={decorEmojis[d.name] || '✨'}
               label={DECO_NAMES[d.name] || d.name}
-              sublabel={`+${parseFloat(d.price).toFixed(2)} ₸`}
+              sublabel={`+${parseFloat(d.price).toFixed(2)} ТМТ`}
               selected={isSelected}
               onClick={() => toggleDecoration(d)}
             />
