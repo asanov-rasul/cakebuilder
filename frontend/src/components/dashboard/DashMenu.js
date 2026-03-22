@@ -1,7 +1,23 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef, useCallback } from 'react';
+import ReactDOM from 'react-dom';
 import { shopAPI } from '../../utils/api';
 import { toast } from 'react-hot-toast';
 import styles from './DashMenu.module.css';
+
+// Default colors for known items
+const DEFAULT_COLORS = {
+  fillings: {
+    'Шоколад': '#3d1005', 'Chocolate': '#3d1005',
+    'Ваниль': '#f5e498', 'Vanilla': '#f5e498',
+    'Клубника': '#e03050', 'Strawberry': '#e03050',
+    'Красный бархат': '#9a0808', 'Red Velvet': '#9a0808',
+  },
+  creams: {
+    'Сливочный крем': '#ffeebb', 'Buttercream': '#ffeebb',
+    'Шоколадный крем': '#2a0e04', 'Chocolate Cream': '#2a0e04',
+    'Ванильный крем': '#fff7c8', 'Vanilla Cream': '#fff7c8',
+  },
+};
 
 // Sections config
 const SECTIONS = [
@@ -20,31 +36,87 @@ const COLOR_PRESETS = [
   '#ffffff', '#fffde7', '#f3f4f6', // white / light
 ];
 
-function ColorPicker({ value, onChange, label }) {
+function ColorPicker({ value, onChange }) {
   const [open, setOpen] = useState(false);
-  const ref = React.useRef(null);
+  const [pos, setPos] = useState({ top: 0, left: 0 });
+  const btnRef = useRef(null);
 
-  // Close on outside click
-  React.useEffect(() => {
+  const calcPos = useCallback(() => {
+    if (!btnRef.current) return;
+    const r = btnRef.current.getBoundingClientRect();
+    setPos({
+      top: r.bottom + window.scrollY + 6,
+      left: Math.min(r.left + window.scrollX, window.innerWidth - 240),
+    });
+  }, []);
+
+  useEffect(() => {
     if (!open) return;
-    const handler = (e) => { if (ref.current && !ref.current.contains(e.target)) setOpen(false); };
-    document.addEventListener('mousedown', handler);
-    return () => document.removeEventListener('mousedown', handler);
-  }, [open]);
+    calcPos();
+    const close = (e) => {
+      if (btnRef.current && !btnRef.current.contains(e.target) &&
+          !document.getElementById('cp-portal')?.contains(e.target))
+        setOpen(false);
+    };
+    document.addEventListener('mousedown', close);
+    window.addEventListener('scroll', calcPos, true);
+    return () => {
+      document.removeEventListener('mousedown', close);
+      window.removeEventListener('scroll', calcPos, true);
+    };
+  }, [open, calcPos]);
+
+  const portal = open ? ReactDOM.createPortal(
+    <div id="cp-portal" style={{
+      position: 'absolute', top: pos.top, left: pos.left, zIndex: 9999,
+      background: '#fff', border: '1px solid #e5e7eb',
+      borderRadius: 14, padding: 14,
+      boxShadow: '0 12px 40px rgba(0,0,0,0.18)',
+      width: 224,
+    }}>
+      <div style={{ fontSize: 12, fontWeight: 600, color: '#374151', marginBottom: 10 }}>
+        🎨 Цвет торта в 3D
+      </div>
+      <input
+        type="color"
+        value={value || '#d09a60'}
+        onChange={e => onChange(e.target.value)}
+        style={{ width: '100%', height: 40, border: 'none', borderRadius: 8,
+          cursor: 'pointer', marginBottom: 10, display: 'block' }}
+      />
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 5, marginBottom: 10 }}>
+        {COLOR_PRESETS.map(col => (
+          <button key={col} type="button"
+            onClick={() => { onChange(col); setOpen(false); }}
+            style={{
+              width: 26, height: 26, borderRadius: 7, background: col,
+              border: value === col ? '2.5px solid #e8614a' : '1.5px solid #e5e7eb',
+              cursor: 'pointer', transition: 'transform 0.1s',
+            }}
+            onMouseEnter={e => e.currentTarget.style.transform = 'scale(1.15)'}
+            onMouseLeave={e => e.currentTarget.style.transform = 'scale(1)'}
+          />
+        ))}
+      </div>
+      <button type="button" onClick={() => setOpen(false)}
+        style={{ width: '100%', padding: '6px 0', fontSize: 13,
+          border: 'none', background: '#f9fafb', borderRadius: 8,
+          cursor: 'pointer', color: '#374151', fontWeight: 500 }}>
+        Применить
+      </button>
+    </div>,
+    document.body
+  ) : null;
 
   return (
-    <div ref={ref} style={{ position: 'relative' }}>
-      {/* Trigger button — color swatch + label */}
-      <button
-        type="button"
-        onClick={() => setOpen(o => !o)}
+    <div style={{ position: 'relative', display: 'inline-block' }}>
+      <button ref={btnRef} type="button" onClick={() => setOpen(o => !o)}
         style={{
           display: 'flex', alignItems: 'center', gap: 6,
           padding: '4px 10px 4px 6px',
           border: '1.5px solid #e5e7eb', borderRadius: 20,
           background: '#fff', cursor: 'pointer',
           fontSize: 12, color: '#6b7280', fontWeight: 500,
-          transition: 'border-color 0.15s',
         }}
         onMouseEnter={e => e.currentTarget.style.borderColor = '#e8614a'}
         onMouseLeave={e => e.currentTarget.style.borderColor = '#e5e7eb'}
@@ -57,61 +129,7 @@ function ColorPicker({ value, onChange, label }) {
         }} />
         🎨 Цвет 3D
       </button>
-
-      {/* Dropdown palette */}
-      {open && (
-        <div style={{
-          position: 'absolute', top: 38, left: 0, zIndex: 200,
-          background: '#fff', border: '1px solid #e5e7eb',
-          borderRadius: 14, padding: 14,
-          boxShadow: '0 12px 32px rgba(0,0,0,0.14)',
-          width: 220, minWidth: 220,
-        }}>
-          <div style={{ fontSize: 12, fontWeight: 600, color: '#374151', marginBottom: 10 }}>
-            🎨 Цвет торта в 3D
-          </div>
-
-          {/* Native color picker */}
-          <input
-            type="color"
-            value={value || '#d09a60'}
-            onChange={e => onChange(e.target.value)}
-            style={{ width: '100%', height: 40, border: 'none', borderRadius: 8,
-              cursor: 'pointer', marginBottom: 10, display: 'block' }}
-          />
-
-          {/* Preset chips */}
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 5, marginBottom: 10 }}>
-            {COLOR_PRESETS.map(c => (
-              <button
-                key={c}
-                type="button"
-                onClick={() => { onChange(c); setOpen(false); }}
-                style={{
-                  width: 26, height: 26, borderRadius: 7,
-                  background: c,
-                  border: value === c ? '2.5px solid #e8614a' : '1.5px solid #e5e7eb',
-                  cursor: 'pointer', transition: 'transform 0.1s',
-                }}
-                onMouseEnter={e => e.currentTarget.style.transform = 'scale(1.15)'}
-                onMouseLeave={e => e.currentTarget.style.transform = 'scale(1)'}
-              />
-            ))}
-          </div>
-
-          <button
-            type="button"
-            onClick={() => setOpen(false)}
-            style={{
-              width: '100%', padding: '6px 0', fontSize: 13,
-              border: 'none', background: '#f9fafb', borderRadius: 8,
-              cursor: 'pointer', color: '#374151', fontWeight: 500,
-            }}
-          >
-            Применить
-          </button>
-        </div>
-      )}
+      {portal}
     </div>
   );
 }
@@ -217,11 +235,12 @@ function MenuSection({ sectionKey, label, icon, addLabel, hasColor, items, onAdd
                     <span className={styles.itemName}>{item.name}</span>
                     {hasColor && (
                       <ColorPicker
-                        value={item.color || '#d09a60'}
+                        value={item.color || DEFAULT_COLORS[sectionKey]?.[item.name] || '#d09a60'}
                         onChange={async (color) => {
                           try {
-                            await onEdit(sectionKey, item.id, { color });
-                          } catch {}
+                            await onEdit(sectionKey, item.id, { ...item, color });
+                            item.color = color; // optimistic update
+                          } catch (e) { console.error(e); }
                         }}
                       />
                     )}
