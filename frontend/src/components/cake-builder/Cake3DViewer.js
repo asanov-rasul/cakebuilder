@@ -260,6 +260,7 @@ function buildCake(scene, state) {
   const shapeName = (shape?.name || '').toLowerCase();
   const shapeSlug = (shape?.slug || '').toLowerCase();
   const sn = shapeSlug || shapeName || 'round';
+  console.log('[3D] shape slug:', shape?.slug, 'name:', shape?.name);
   const isSquare = shapeSlug === 'square' || shapeName.includes('квадр') || shapeName === 'square';
   const radius = isSquare ? 0.30 + kg * 0.055 : 0.33 + kg * 0.11;
   const layerH = 0.16 + kg * 0.024;
@@ -269,18 +270,35 @@ function buildCake(scene, state) {
   // Use custom color from DB if set, otherwise fall back to palette
   const fillingCustomColor = filling?.color ? hexToInt(filling.color) : null;
   const fC_base = FILLING_COLORS[Object.keys(FILLING_COLORS).find(k => filling?.name?.includes(k)) || 'default'];
-  const fC = fillingCustomColor ? {
-    base:  Math.max(0, fillingCustomColor - 0x222222),
-    mid:   fillingCustomColor,
-    light: Math.min(0xffffff, fillingCustomColor + 0x333333),
-  } : fC_base;
+  const fC = fillingCustomColor ? (() => {
+    const r = (fillingCustomColor >> 16) & 0xff;
+    const g = (fillingCustomColor >> 8)  & 0xff;
+    const b =  fillingCustomColor        & 0xff;
+    const clamp = (v) => Math.max(0, Math.min(255, v));
+    const toHex = (r,g,b) => (r << 16) | (g << 8) | b;
+    return {
+      base:  toHex(clamp(r-30), clamp(g-30), clamp(b-30)),
+      mid:   fillingCustomColor,
+      light: toHex(clamp(r+50), clamp(g+50), clamp(b+50)),
+    };
+  })() : fC_base;
   const creamCustomColor = cream?.color ? hexToInt(cream.color) : null;
   const cC_base = CREAM_COLORS[Object.keys(CREAM_COLORS).find(k => cream?.name?.includes(k)) || 'default'];
-  const cC = creamCustomColor ? {
-    top:  Math.min(0xffffff, creamCustomColor + 0x111111),
-    side: creamCustomColor,
-    drip: Math.max(0, creamCustomColor - 0x111111),
-  } : cC_base;
+  const cC = creamCustomColor ? (() => {
+    // Extract R,G,B channels and adjust each independently to avoid overflow/underflow
+    const r = (creamCustomColor >> 16) & 0xff;
+    const g = (creamCustomColor >> 8)  & 0xff;
+    const b =  creamCustomColor        & 0xff;
+    const clamp = (v) => Math.max(0, Math.min(255, v));
+    const lighten = (v, amt) => clamp(v + amt);
+    const darken  = (v, amt) => clamp(v - amt);
+    const toHex = (r,g,b) => (r << 16) | (g << 8) | b;
+    return {
+      top:  toHex(lighten(r,20), lighten(g,20), lighten(b,20)),
+      side: creamCustomColor,
+      drip: toHex(darken(r,20),  darken(g,20),  darken(b,20)),
+    };
+  })() : cC_base;
 
   /* totalH = height of the bare sponge stack.
      All geometry inside `group` is built with Y = 0 at the GROUP'S base
