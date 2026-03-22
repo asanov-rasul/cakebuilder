@@ -260,7 +260,6 @@ function buildCake(scene, state) {
   const shapeName = (shape?.name || '').toLowerCase();
   const shapeSlug = (shape?.slug || '').toLowerCase();
   const sn = shapeSlug || shapeName || 'round';
-  console.log('[3D] shape slug:', shape?.slug, 'name:', shape?.name);
   const isSquare = shapeSlug === 'square' || shapeName.includes('квадр') || shapeName === 'square';
   const radius = isSquare ? 0.30 + kg * 0.055 : 0.33 + kg * 0.11;
   const layerH = 0.16 + kg * 0.024;
