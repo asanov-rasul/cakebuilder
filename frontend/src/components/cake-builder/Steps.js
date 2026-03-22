@@ -27,7 +27,44 @@ function OptionCard({ emoji, label, sublabel, selected, onClick, badge }) {
 // Шаг 1: Форма — только круг и квадрат
 export function StepShape({ shapes }) {
   const { shape, setShape } = useCakeStore();
-  const shapeEmojis = { round: '⭕', square: '⬛' };
+  const shapeEmojis = { round: `<svg width="80" height="80" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- тень -->
+  <ellipse cx="32" cy="50" rx="20" ry="6" fill="#000" opacity="0.1"/>
+  
+  <!-- нижний слой -->
+  <ellipse cx="32" cy="40" rx="20" ry="8" fill="#D28B5C"/>
+  <rect x="12" y="30" width="40" height="10" fill="#D28B5C"/>
+  
+  <!-- крем -->
+  <ellipse cx="32" cy="30" rx="20" ry="8" fill="#FFF3E0"/>
+  <path d="M12 30 Q16 35 20 30 T28 30 T36 30 T44 30 T52 30" fill="#FFF3E0"/>
+  
+  <!-- верх -->
+  <ellipse cx="32" cy="24" rx="16" ry="6" fill="#FFB6C1"/>
+  
+  <!-- свечка -->
+  <rect x="30" y="10" width="4" height="10" fill="#6C63FF"/>
+  <ellipse cx="32" cy="8" rx="2" ry="3" fill="#FFA500"/>
+</svg>`, square: `<svg width="80" height="80" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- тень -->
+  <rect x="16" y="50" width="32" height="6" rx="2" fill="#000" opacity="0.1"/>
+
+  <!-- нижний слой (бисквит) -->
+  <rect x="12" y="32" width="40" height="14" rx="2" fill="#D28B5C"/>
+
+  <!-- крем между слоями -->
+  <rect x="12" y="28" width="40" height="6" rx="2" fill="#FFF3E0"/>
+
+  <!-- верхний слой -->
+  <rect x="16" y="20" width="32" height="10" rx="2" fill="#FFB6C1"/>
+
+  <!-- подтеки крема (сделаны угловатыми) -->
+  <path d="M16 30 L20 34 L24 30 L28 34 L32 30 L36 34 L40 30 L44 34 L48 30 L48 28 L16 28 Z" fill="#FFF3E0"/>
+
+  <!-- свечка -->
+  <rect x="30" y="10" width="4" height="10" fill="#6C63FF"/>
+  <polygon points="32,6 34,10 30,10" fill="#FFA500"/>
+</svg>` };
   const allowed = shapes.filter(s => s.slug === 'round' || s.slug === 'square');
 
   return (
