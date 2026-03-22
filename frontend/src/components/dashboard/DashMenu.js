@@ -186,7 +186,6 @@ function MenuSection({ sectionKey, label, icon, addLabel, hasColor, items, onAdd
               placeholder="Доп. цена"
               value={form[priceField]}
               onChange={e => setForm({ ...form, [priceField]: e.target.value })} />
-            <span className={styles.dollarSign}>ТМТ</span>
           </div>
           {hasColor && (
             <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
@@ -212,7 +211,6 @@ function MenuSection({ sectionKey, label, icon, addLabel, hasColor, items, onAdd
                   <input className={`form-input ${styles.priceInput}`} type="number" min="0" step="0.5"
                     value={editForm[priceField] || 0}
                     onChange={e => setEditForm({ ...editForm, [priceField]: e.target.value })} />
-                  <span className={styles.dollarSign}>ТМТ</span>
                 </div>
                 {hasColor && (
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
