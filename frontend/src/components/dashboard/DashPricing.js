@@ -131,7 +131,6 @@ export default function DashPricing() {
               <div key={item.id} className={`${styles.tableRow} ${!item.is_active ? styles.rowDisabled : ''}`}>
                 <span className={styles.itemName}>{item.name || `${item.weight_kg}kg`}</span>
                 <div className={styles.priceInputGroup}>
-                  <span className={styles.dollarPrefix}>$</span>
                   <input
                     className="form-input"
                     type="number" min="0" step="0.5"
