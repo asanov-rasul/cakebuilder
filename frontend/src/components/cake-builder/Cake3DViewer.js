@@ -627,8 +627,8 @@ export default function Cake3DViewer() {
     sceneRef.current = scene;
 
     const camera = new THREE.PerspectiveCamera(40, W/H, 0.01, 100);
-    camera.position.set(0, 0.8, 2.4);
-    camera.lookAt(0, 0.3, 0);
+    camera.position.set(0, 1.4, 2.2);
+    camera.lookAt(0, 0.5, 0);
     cameraRef.current = camera;
 
     scene.add(new THREE.AmbientLight(0xfff5e0, 0.65));
@@ -667,7 +667,7 @@ export default function Cake3DViewer() {
           obj.rotation.y = currentRot.current;
       });
 
-      camera.position.y = 0.8 + Math.sin(t * 0.35) * 0.018;
+      camera.position.y = 1.4 + Math.sin(t * 0.35) * 0.018;
       renderer.render(scene, camera);
     };
     animate();
