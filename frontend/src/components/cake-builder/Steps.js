@@ -27,7 +27,7 @@ function OptionCard({ emoji, label, sublabel, selected, onClick, badge }) {
 // Шаг 1: Форма — только круг и квадрат
 export function StepShape({ shapes }) {
   const { shape, setShape } = useCakeStore();
-  const shapeEmojis = { round: '<a href="https://www.flaticon.com/free-icons/isometric" title="isometric icons">Isometric icons created by Ylivdesign - Flaticon</a>', square: '<a href="https://www.flaticon.com/free-icons/cake" title="cake icons">Cake icons created by Ylivdesign - Flaticon</a>' };
+  const shapeEmojis = { round: '<img src="https://cdn-icons-png.flaticon.com/512/1046/1046784.png" alt="round cake">', square: '<img src="https://cdn-icons-png.flaticon.com/512/3075/3075977.png" alt="square cake">' };
   const allowed = shapes.filter(s => s.slug === 'round' || s.slug === 'square');
 
   return (
