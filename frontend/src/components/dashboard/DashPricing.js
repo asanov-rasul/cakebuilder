@@ -1,17 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import { shopAPI } from '../../utils/api';
 import { toast } from 'react-hot-toast';
-import { useLang } from '../../i18n';
 import styles from './DashPricing.module.css';
 
 export default function DashPricing() {
   const [shop, setShop] = useState(null);
-  const [menu, setMenu] = useState({ sizes: [] });
+  const [menu, setMenu] = useState({ sizes: [], shapes: [], fillings: [], creams: [], decorations: [] });
   const [basePrice, setBasePrice] = useState('');
   const [saving, setSaving] = useState(false);
   const [loading, setLoading] = useState(true);
-  const { t } = useLang();
-  const P = t.dashboard.pricing;
 
   useEffect(() => {
     Promise.all([shopAPI.getMy(), shopAPI.getMenu()]).then(([shopRes, menuRes]) => {
@@ -22,13 +19,13 @@ export default function DashPricing() {
   }, []);
 
   const saveBasePrice = async () => {
-    if (!basePrice || isNaN(basePrice)) return toast.error(P.invalidPrice);
+    if (!basePrice || isNaN(basePrice)) return toast.error('Введите корректную цену');
     setSaving(true);
     try {
       const res = await shopAPI.updateMy({ ...shop, price_per_kg_base: parseFloat(basePrice) });
       setShop(res.data);
-      toast.success(P.saveSuccess);
-    } catch { toast.error(P.saveError); }
+      toast.success('Базовая цена сохранена!');
+    } catch { toast.error('Не удалось сохранить'); }
     finally { setSaving(false); }
   };
 
@@ -39,8 +36,8 @@ export default function DashPricing() {
         ...prev,
         [type]: prev[type].map(i => i.id === id ? { ...i, [field]: value } : i),
       }));
-      toast.success(P.updateSuccess);
-    } catch { toast.error(P.updateError); }
+      toast.success('Цена обновлена');
+    } catch { toast.error('Не удалось обновить'); }
   };
 
   const calcExample = (size) => {
@@ -53,54 +50,105 @@ export default function DashPricing() {
   return (
     <div className={styles.page}>
       <div className={styles.pageHeader}>
-        <h1 className={styles.title}>{P.title}</h1>
-        <p className={styles.sub}>{P.sub}</p>
+        <h1 className={styles.title}>Pricing settings</h1>
+        <p className={styles.sub}>Set your base price and per-item price modifiers</p>
       </div>
 
+      {/* Base price */}
       <div className={styles.card}>
-        <div className={styles.cardTitle}>{P.basePriceTitle}</div>
-        <p className={styles.cardDesc}>{P.basePriceDesc}</p>
+        <div className={styles.cardTitle}>Base price per kg</div>
+        <p className={styles.cardDesc}>This is the starting price for a 1kg cake. All sizes multiply from this value.</p>
         <div className={styles.basePriceRow}>
-          <div className={styles.priceInputWrap}>
-            <span className={styles.dollarSign}>TMT</span>
+          <div className={styles.inputGroup}>
+            <span className={styles.inputPrefix}>ТМТ</span>
             <input
-              className={`form-input ${styles.priceInput}`}
+              className="form-input"
               type="number" min="1" step="0.5"
+              style={{ paddingLeft: 28 }}
               value={basePrice}
               onChange={e => setBasePrice(e.target.value)}
             />
-            <span className={styles.perKg}>{P.basePricePer}</span>
+            <span className={styles.inputSuffix}>per kg</span>
           </div>
           <button className="btn btn-primary" onClick={saveBasePrice} disabled={saving}>
-            {saving ? <span className="spinner" style={{ width: 16, height: 16 }} /> : P.saveBase}
+            {saving ? <span className="spinner" /> : 'Сохранить цену'}
           </button>
         </div>
       </div>
 
-      {menu.sizes?.length > 0 && (
-        <div className={styles.card}>
-          <div className={styles.cardTitle}>{P.sizesTitle}</div>
-          <p className={styles.cardDesc}>{P.sizesDesc}</p>
-          <div className={styles.sizesTable}>
-            {menu.sizes.map(size => (
-              <div key={size.id} className={styles.sizeRow}>
-                <div className={styles.sizeLabel}>{size.weight_kg} kg</div>
-                <div className={styles.sizeMultiplier}>×{size.price_multiplier}</div>
-                <div className={styles.sizeExample}>{P.example}: <strong>${calcExample(size)}</strong></div>
-                <div className={styles.priceInputWrap}>
-                  <span className={styles.dollarSign}>×</span>
+      {/* Size pricing */}
+      <div className={styles.card}>
+        <div className={styles.cardTitle}>Size pricing</div>
+        <p className={styles.cardDesc}>Set the multiplier for each size. Final price = base × kg × multiplier.</p>
+        <div className={styles.table}>
+          <div className={styles.tableHead}>
+            <span>Size</span>
+            <span>Multiplier</span>
+            <span>Example price</span>
+          </div>
+          {menu.sizes.map(size => (
+            <div key={size.id} className={styles.tableRow}>
+              <span className={styles.sizeLabel}>🎂 {size.weight_kg} kg</span>
+              <div className={styles.multiplierInput}>
+                <input
+                  className="form-input"
+                  type="number" min="0.5" step="0.1"
+                  style={{ width: 90 }}
+                  value={size.price_multiplier}
+                  onChange={e => setMenu(prev => ({
+                    ...prev,
+                    sizes: prev.sizes.map(s => s.id === size.id ? { ...s, price_multiplier: e.target.value } : s),
+                  }))}
+                  onBlur={e => updateItemPrice('sizes', size.id, 'price_multiplier', e.target.value)}
+                />
+                <span className={styles.xLabel}>×</span>
+              </div>
+              <span className={styles.examplePrice}>ТМТ{calcExample(size)}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Modifier tables */}
+      {[
+        { key: 'shapes', label: 'Shape add-ons', field: 'price_modifier', icon: '🔵' },
+        { key: 'fillings', label: 'Filling add-ons', field: 'price_modifier', icon: '🍫' },
+        { key: 'creams', label: 'Cream add-ons', field: 'price_modifier', icon: '🧁' },
+        { key: 'decorations', label: 'Decoration prices', field: 'price', icon: '🍓' },
+      ].map(({ key, label, field, icon }) => (
+        <div className={styles.card} key={key}>
+          <div className={styles.cardTitle}>{icon} {label}</div>
+          <p className={styles.cardDesc}>Extra cost added on top of the base cake price.</p>
+          <div className={styles.table}>
+            <div className={styles.tableHead}>
+              <span>Name</span>
+              <span>Extra price (ТМТ)</span>
+            </div>
+            {menu[key]?.length === 0 && (
+              <div className={styles.emptyRow}>No items — add them in Menu settings</div>
+            )}
+            {menu[key]?.map(item => (
+              <div key={item.id} className={`${styles.tableRow} ${!item.is_active ? styles.rowDisabled : ''}`}>
+                <span className={styles.itemName}>{item.name || `${item.weight_kg}kg`}</span>
+                <div className={styles.priceInputGroup}>
+                  <span className={styles.dollarPrefix}>ТМТ</span>
                   <input
-                    className={`form-input ${styles.priceInput}`}
-                    type="number" min="0.1" step="0.1"
-                    value={size.price_multiplier}
-                    onChange={e => updateItemPrice('sizes', size.id, 'price_multiplier', e.target.value)}
+                    className="form-input"
+                    type="number" min="0" step="0.5"
+                    style={{ width: 90, paddingLeft: 22 }}
+                    value={item[field] ?? 0}
+                    onChange={e => setMenu(prev => ({
+                      ...prev,
+                      [key]: prev[key].map(i => i.id === item.id ? { ...i, [field]: e.target.value } : i),
+                    }))}
+                    onBlur={e => updateItemPrice(key, item.id, field, e.target.value)}
                   />
                 </div>
               </div>
             ))}
           </div>
         </div>
-      )}
+      ))}
     </div>
   );
 }
