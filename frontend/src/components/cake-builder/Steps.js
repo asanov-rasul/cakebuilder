@@ -6,6 +6,10 @@ import cakeSquareImg from '../../assets/cake-square.png';
 import cake1kg from '../../assets/cake-1kg.png';
 import cake2kg from '../../assets/cake-2kg.png';
 import cake3kg from '../../assets/cake-3kg.png';
+import fillingChocolate from '../../assets/chocolate-filling.png';
+import fillingRedVelvet from '../../assets/red-velvet-filling.png';
+import fillingStrawberry from '../../assets/strawberry-filling.png';
+import fillingVanilla from '../../assets/vanilla-filling.png';
 
 // Русские названия по slug/name
 const SHAPE_NAMES   = { round: 'Круглый', circle: 'Круглый', square: 'Квадратный' };
@@ -92,7 +96,12 @@ export function StepSize({ sizes, pricePerKg }) {
 // Шаг 3: Начинка
 export function StepFilling({ fillings }) {
   const { filling, setFilling } = useCakeStore();
-  const fillingEmojis = { Chocolate: '🍫', Vanilla: '🤍', Strawberry: '🍓', 'Red Velvet': '❤️' };
+  const fillingEmojis = {
+                          Шоколад: <img src={fillingChocolate} alt="Шоколад" style={{ width: 44, height: 44, objectFit: 'contain' }} />,
+                          Ваниль: <img src={fillingVanilla} alt="Ваниль" style={{ width: 44, height: 44, objectFit: 'contain' }} />,
+                          Клубника: <img src={fillingStrawberry} alt="Клубника" style={{ width: 44, height: 44, objectFit: 'contain' }} />,
+                          'Красный бархат': <img src={fillingRedVelvet} alt="Красный бархат" style={{ width: 44, height: 44, objectFit: 'contain' }} />,
+                        };
 
   return (
     <div className={styles.grid2}>
