@@ -10,6 +10,12 @@ import fillingChocolate from '../../assets/chocolate-filling.png';
 import fillingRedVelvet from '../../assets/red-velvet-filling.png';
 import fillingStrawberry from '../../assets/strawberry-filling.png';
 import fillingVanilla from '../../assets/vanilla-filling.png';
+import creamVanilla from '../../assets/vanilla-cream.png';
+import creamChocolate from '../../assets/chocolate-cream.png';
+import creamButter from '../../assets/butter-cream.png';
+import decorBerries from '../../assets/berry-decor.png';
+import decorChocolate from '../../assets/chocolate-decor.png';
+import decorFruits from '../../assets/fruit-decor.png';
 
 // Русские названия по slug/name
 const SHAPE_NAMES   = { round: 'Круглый', circle: 'Круглый', square: 'Квадратный' };
@@ -74,12 +80,12 @@ export function StepSize({ sizes, pricePerKg }) {
             <OptionCard
               key={s.id}
               emoji={
-                      s.weight_kg <= 1
-                        ? <img src={cake1kg} alt="1 кг" style={{ width: 44, height: 44, objectFit: 'contain' }} />
-                        : s.weight_kg <= 2
-                          ? <img src={cake2kg} alt="2 кг" style={{ width: 44, height: 44, objectFit: 'contain' }} />
-                          : <img src={cake3kg} alt="3 кг" style={{ width: 44, height: 44, objectFit: 'contain' }} />
-                    }
+                s.weight_kg <= 1
+                  ? <img src={cake1kg} alt="1 кг" style={{ width: 44, height: 44, objectFit: 'contain' }} />
+                  : s.weight_kg <= 2
+                    ? <img src={cake2kg} alt="2 кг" style={{ width: 44, height: 44, objectFit: 'contain' }} />
+                    : <img src={cake3kg} alt="3 кг" style={{ width: 44, height: 44, objectFit: 'contain' }} />
+              }
               label={`${s.weight_kg} кг`}
               sublabel={`от ${price} ТМТ`}
               selected={size?.id === s.id}
@@ -97,11 +103,11 @@ export function StepSize({ sizes, pricePerKg }) {
 export function StepFilling({ fillings }) {
   const { filling, setFilling } = useCakeStore();
   const fillingEmojis = {
-                          Шоколад: <img src={fillingChocolate} alt="Шоколад" style={{ width: 44, height: 44, objectFit: 'contain' }} />,
-                          Ваниль: <img src={fillingVanilla} alt="Ваниль" style={{ width: 44, height: 44, objectFit: 'contain' }} />,
-                          Клубника: <img src={fillingStrawberry} alt="Клубника" style={{ width: 44, height: 44, objectFit: 'contain' }} />,
-                          'Красный бархат': <img src={fillingRedVelvet} alt="Красный бархат" style={{ width: 44, height: 44, objectFit: 'contain' }} />,
-                        };
+    Шоколад: <img src={fillingChocolate} alt="Шоколад" style={{ width: 44, height: 44, objectFit: 'contain' }} />,
+    Ваниль: <img src={fillingVanilla} alt="Ваниль" style={{ width: 44, height: 44, objectFit: 'contain' }} />,
+    Клубника: <img src={fillingStrawberry} alt="Клубника" style={{ width: 44, height: 44, objectFit: 'contain' }} />,
+    'Красный бархат': <img src={fillingRedVelvet} alt="Красный бархат" style={{ width: 44, height: 44, objectFit: 'contain' }} />,
+  };
 
   return (
     <div className={styles.grid2}>
@@ -122,7 +128,11 @@ export function StepFilling({ fillings }) {
 // Шаг 4: Крем
 export function StepCream({ creams }) {
   const { cream, setCream } = useCakeStore();
-  const creamEmojis = { Buttercream: '🧈', 'Chocolate Cream': '🍫', 'Vanilla Cream': '🤍' };
+  const creamEmojis = {
+    'Сливочный крем': <img src={creamButter} alt="Сливочный крем" style={{ width: 44, height: 44, objectFit: 'contain' }} />,
+    'Шоколадный крем': <img src={creamChocolate} alt="Шоколадный крем" style={{ width: 44, height: 44, objectFit: 'contain' }} />,
+    'Ванильный крем': <img src={creamVanilla} alt="Ванильный крем" style={{ width: 44, height: 44, objectFit: 'contain' }} />,
+  };
 
   return (
     <div className={styles.grid2}>
@@ -143,7 +153,11 @@ export function StepCream({ creams }) {
 // Шаг 5: Украшения
 export function StepDecorations({ decorations }) {
   const { decorations: selected, toggleDecoration } = useCakeStore();
-  const decorEmojis = { 'Fresh Fruits': '🍊', Berries: '🫐', 'Chocolate Pieces': '🍫', 'Custom Figures': '🎭' };
+  const decorEmojis = {
+    'Свежие фрукты': <img src={decorFruits} alt="Свежие фрукты" style={{ width: 44, height: 44, objectFit: 'contain' }} />,
+    'Ягоды': <img src={decorBerries} alt="Ягоды" style={{ width: 44, height: 44, objectFit: 'contain' }} />,
+    'Шоколадные кусочки': <img src={decorChocolate} alt="Шоколадные кусочки" style={{ width: 44, height: 44, objectFit: 'contain' }} />,
+  };
 
   return (
     <div>
