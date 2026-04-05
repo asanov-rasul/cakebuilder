@@ -1,6 +1,11 @@
 import React from 'react';
 import useCakeStore from '../../store/cakeStore';
 import styles from './Steps.module.css';
+import cakeRoundImg from '../../assets/cake-round.jpg';
+import cakeSquareImg from '../../assets/cake-square.jpg';
+import cake1kg from '../../assets/cake-1kg.jpg';
+import cake2kg from '../../assets/cake-2kg.jpg';
+import cake3kg from '../../assets/cake-3kg.jpg';
 
 // Русские названия по slug/name
 const SHAPE_NAMES   = { round: 'Круглый', circle: 'Круглый', square: 'Квадратный' };
@@ -27,8 +32,12 @@ function OptionCard({ emoji, label, sublabel, selected, onClick, badge }) {
 // Шаг 1: Форма — только круг и квадрат
 export function StepShape({ shapes }) {
   const { shape, setShape } = useCakeStore();
-  const shapeEmojis = { round: '⭕', square: '⬛' };
+  const shapeEmojis = {
+  round: <img src={cakeRoundImg} alt="Круг" style={{ width: 44, height: 44, objectFit: 'contain' }} />,
+  square: <img src={cakeSquareImg} alt="Круг" style={{ width: 44, height: 44, objectFit: 'contain' }} />,
+};
   const allowed = shapes.filter(s => s.slug === 'round' || s.slug === 'square');
+  
 
   return (
     <div className={styles.grid3}>
@@ -60,7 +69,13 @@ export function StepSize({ sizes, pricePerKg }) {
           return (
             <OptionCard
               key={s.id}
-              emoji={s.weight_kg <= 1 ? '🍰' : s.weight_kg <= 2 ? '🎂' : '🎆'}
+              emoji={
+                      s.weight_kg <= 1
+                        ? <img src={cake1kg} alt="1 кг" style={{ width: 44, height: 44, objectFit: 'contain' }} />
+                        : s.weight_kg <= 2
+                          ? <img src={cake2kg} alt="2 кг" style={{ width: 44, height: 44, objectFit: 'contain' }} />
+                          : <img src={cake3kg} alt="3 кг" style={{ width: 44, height: 44, objectFit: 'contain' }} />
+                    }
               label={`${s.weight_kg} кг`}
               sublabel={`от ${price} ТМТ`}
               selected={size?.id === s.id}
