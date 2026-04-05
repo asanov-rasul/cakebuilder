@@ -530,24 +530,6 @@ function buildCake(scene, state) {
     }
   }
 
-  /* ── Text ────────────────────────────────────────────────────────────────
-     Rendered as a flat plane just above the cream surface.               */
-  if (cakeText && cakeText.trim()) {
-    const tr  = radius * 0.84;
-    const tGeo = isSquare
-      ? new THREE.PlaneGeometry(tr*1.9, tr*1.9)
-      : new THREE.CircleGeometry(tr, 64);
-    const tMat = new THREE.MeshStandardMaterial({
-      map: makeTextTexture(cakeText.trim()),
-      transparent: true, roughness: 0.6, depthWrite: false,
-    });
-    const tm = new THREE.Mesh(tGeo, tMat);
-    tm.rotation.x  = -Math.PI / 2;
-    tm.position.y  = creamTopY + 0.018; // float just above cream
-    tm.renderOrder = 2;
-    tm.userData.isCake = true; group.add(tm);
-  }
-
   /* Centre group so cake mid-point sits at world Y=0 */
   // Cake bottom at Y=0 (plate surface), top at Y=totalH
   group.position.y = 0;
