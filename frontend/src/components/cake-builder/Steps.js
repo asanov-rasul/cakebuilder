@@ -13,9 +13,9 @@ import fillingVanilla from '../../assets/vanilla-filling.png';
 import creamVanilla from '../../assets/vanilla-cream.png';
 import creamChocolate from '../../assets/chocolate-cream.png';
 import creamButter from '../../assets/butter-cream.png';
-import decorBerries from '../../assets/berry-decor.png';
+import decorBerries from '../../assets/berries-decor.png';
 import decorChocolate from '../../assets/chocolate-decor.png';
-import decorFruits from '../../assets/fruit-decor.png';
+import decorFruits from '../../assets/fruits-decor.png';
 
 // Русские названия по slug/name
 const SHAPE_NAMES   = { round: 'Круглый', circle: 'Круглый', square: 'Квадратный' };
