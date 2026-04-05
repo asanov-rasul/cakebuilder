@@ -253,7 +253,7 @@ function buildCake(scene, state) {
     scene.remove(o);
   });
 
-  const { shape, size, filling, cream, decorations, cakeText } = state;
+  const { shape, size, filling, cream, decorations } = state;
 
   const kg = size ? parseFloat(size.weight_kg) : 1;
 
@@ -586,9 +586,9 @@ export default function Cake3DViewer() {
 
   useEffect(() => {
     if (!sceneRef.current) return;
-    const { radius, isSquare } = buildCake(sceneRef.current, { shape, size, filling, cream, decorations, cakeText });
+    const { radius, isSquare } = buildCake(sceneRef.current, { shape, size, filling, cream, decorations });
     buildPlate(sceneRef.current, radius, isSquare);
-  }, [shape, size, filling, cream, decorations, cakeText]);
+  }, [shape, size, filling, cream, decorations]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
