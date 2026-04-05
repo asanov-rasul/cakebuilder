@@ -2,10 +2,10 @@ import React from 'react';
 import useCakeStore from '../../store/cakeStore';
 import styles from './Steps.module.css';
 import cakeRoundImg from '../../assets/cake-round.png';
-import cakeSquareImg from '../../assets/cake-square.jpg';
-import cake1kg from '../../assets/cake-1kg.jpg';
-import cake2kg from '../../assets/cake-2kg.jpg';
-import cake3kg from '../../assets/cake-3kg.jpg';
+import cakeSquareImg from '../../assets/cake-square.png';
+import cake1kg from '../../assets/cake-1kg.png';
+import cake2kg from '../../assets/cake-2kg.png';
+import cake3kg from '../../assets/cake-3kg.png';
 
 // Русские названия по slug/name
 const SHAPE_NAMES   = { round: 'Круглый', circle: 'Круглый', square: 'Квадратный' };
