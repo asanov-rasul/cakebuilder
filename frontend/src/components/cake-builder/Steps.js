@@ -43,8 +43,8 @@ function OptionCard({ emoji, label, sublabel, selected, onClick, badge }) {
 export function StepShape({ shapes }) {
   const { shape, setShape } = useCakeStore();
   const shapeEmojis = {
-  round: <img src={cakeRoundImg} alt="Круг" style={{ width: 44, height: 44, objectFit: 'contain' }} />,
-  square: <img src={cakeSquareImg} alt="Круг" style={{ width: 44, height: 44, objectFit: 'contain' }} />,
+  round: <img src={cakeRoundImg} alt="Круг" style={{ width: 50, height: 50, objectFit: 'contain' }} />,
+  square: <img src={cakeSquareImg} alt="Круг" style={{ width: 50, height: 50, objectFit: 'contain' }} />,
 };
   const allowed = shapes.filter(s => s.slug === 'round' || s.slug === 'square');
   
@@ -81,10 +81,10 @@ export function StepSize({ sizes, pricePerKg }) {
               key={s.id}
               emoji={
                 s.weight_kg <= 1
-                  ? <img src={cake1kg} alt="1 кг" style={{ width: 44, height: 44, objectFit: 'contain' }} />
+                  ? <img src={cake1kg} alt="1 кг" style={{ width: 50, height: 50, objectFit: 'contain' }} />
                   : s.weight_kg <= 2
-                    ? <img src={cake2kg} alt="2 кг" style={{ width: 44, height: 44, objectFit: 'contain' }} />
-                    : <img src={cake3kg} alt="3 кг" style={{ width: 44, height: 44, objectFit: 'contain' }} />
+                    ? <img src={cake2kg} alt="2 кг" style={{ width: 50, height: 50, objectFit: 'contain' }} />
+                    : <img src={cake3kg} alt="3 кг" style={{ width: 50, height: 50, objectFit: 'contain' }} />
               }
               label={`${s.weight_kg} кг`}
               sublabel={`от ${price} ТМТ`}
@@ -103,10 +103,10 @@ export function StepSize({ sizes, pricePerKg }) {
 export function StepFilling({ fillings }) {
   const { filling, setFilling } = useCakeStore();
   const fillingEmojis = {
-    Шоколад: <img src={fillingChocolate} alt="Шоколад" style={{ width: 44, height: 44, objectFit: 'contain' }} />,
-    Ваниль: <img src={fillingVanilla} alt="Ваниль" style={{ width: 44, height: 44, objectFit: 'contain' }} />,
-    Клубника: <img src={fillingStrawberry} alt="Клубника" style={{ width: 44, height: 44, objectFit: 'contain' }} />,
-    'Красный бархат': <img src={fillingRedVelvet} alt="Красный бархат" style={{ width: 44, height: 44, objectFit: 'contain' }} />,
+    Шоколад: <img src={fillingChocolate} alt="Шоколад" style={{ width: 50, height: 50, objectFit: 'contain' }} />,
+    Ваниль: <img src={fillingVanilla} alt="Ваниль" style={{ width: 50, height: 50, objectFit: 'contain' }} />,
+    Клубника: <img src={fillingStrawberry} alt="Клубника" style={{ width: 50, height: 50, objectFit: 'contain' }} />,
+    'Красный бархат': <img src={fillingRedVelvet} alt="Красный бархат" style={{ width: 50, height: 50, objectFit: 'contain' }} />,
   };
 
   return (
@@ -129,9 +129,9 @@ export function StepFilling({ fillings }) {
 export function StepCream({ creams }) {
   const { cream, setCream } = useCakeStore();
   const creamEmojis = {
-    'Сливочный крем': <img src={creamButter} alt="Сливочный крем" style={{ width: 44, height: 44, objectFit: 'contain' }} />,
-    'Шоколадный крем': <img src={creamChocolate} alt="Шоколадный крем" style={{ width: 44, height: 44, objectFit: 'contain' }} />,
-    'Ванильный крем': <img src={creamVanilla} alt="Ванильный крем" style={{ width: 44, height: 44, objectFit: 'contain' }} />,
+    'Сливочный крем': <img src={creamButter} alt="Сливочный крем" style={{ width: 50, height: 50, objectFit: 'contain' }} />,
+    'Шоколадный крем': <img src={creamChocolate} alt="Шоколадный крем" style={{ width: 50, height: 50, objectFit: 'contain' }} />,
+    'Ванильный крем': <img src={creamVanilla} alt="Ванильный крем" style={{ width: 50, height: 50, objectFit: 'contain' }} />,
   };
 
   return (
@@ -154,9 +154,9 @@ export function StepCream({ creams }) {
 export function StepDecorations({ decorations }) {
   const { decorations: selected, toggleDecoration } = useCakeStore();
   const decorEmojis = {
-    'Свежие фрукты': <img src={decorFruits} alt="Свежие фрукты" style={{ width: 44, height: 44, objectFit: 'contain' }} />,
-    'Ягоды': <img src={decorBerries} alt="Ягоды" style={{ width: 44, height: 44, objectFit: 'contain' }} />,
-    'Шоколадные кусочки': <img src={decorChocolate} alt="Шоколадные кусочки" style={{ width: 44, height: 44, objectFit: 'contain' }} />,
+    'Свежие фрукты': <img src={decorFruits} alt="Свежие фрукты" style={{ width: 50, height: 50, objectFit: 'contain' }} />,
+    'Ягоды': <img src={decorBerries} alt="Ягоды" style={{ width: 50, height: 50, objectFit: 'contain' }} />,
+    'Шоколадные кусочки': <img src={decorChocolate} alt="Шоколадные кусочки" style={{ width: 50, height: 50, objectFit: 'contain' }} />,
   };
 
   return (
