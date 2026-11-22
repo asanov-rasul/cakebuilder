@@ -1,28 +1,34 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, Suspense, lazy } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import useAuthStore from './store/authStore';
 import './styles/global.css';
 import { LangProvider } from './i18n';
 
-import LandingPage    from './pages/LandingPage';
-import LoginPage      from './pages/LoginPage';
-import RegisterPage   from './pages/RegisterPage';
-import ShopPage       from './pages/ShopPage';
-import ShopDashboard  from './pages/ShopDashboard';
-import AdminDashboard from './pages/AdminDashboard';
+// Each page is its own chunk: a customer opening /shop/:slug no longer
+// downloads the owner dashboard and the admin panel.
+const LandingPage    = lazy(() => import('./pages/LandingPage'));
+const LoginPage      = lazy(() => import('./pages/LoginPage'));
+const RegisterPage   = lazy(() => import('./pages/RegisterPage'));
+const ShopPage       = lazy(() => import('./pages/ShopPage'));
+const ShopDashboard  = lazy(() => import('./pages/ShopDashboard'));
+const AdminDashboard = lazy(() => import('./pages/AdminDashboard'));
+
+const Loader = () => <div className="page-loader"><div className="spinner" /></div>;
 
 function PrivateRoute({ children, role }) {
-  const { user, initialized } = useAuthStore();
-  if (!initialized) return <div className="page-loader"><div className="spinner" /></div>;
+  const user = useAuthStore((s) => s.user);
+  const initialized = useAuthStore((s) => s.initialized);
+  if (!initialized) return <Loader />;
   if (!user) return <Navigate to="/login" replace />;
   if (role && user.role !== role) return <Navigate to="/" replace />;
   return children;
 }
 
 function PublicOnlyRoute({ children }) {
-  const { user, initialized } = useAuthStore();
-  if (!initialized) return <div className="page-loader"><div className="spinner" /></div>;
+  const user = useAuthStore((s) => s.user);
+  const initialized = useAuthStore((s) => s.initialized);
+  if (!initialized) return <Loader />;
   if (user) {
     if (user.role === 'admin') return <Navigate to="/admin" replace />;
     if (user.role === 'shop_owner') return <Navigate to="/dashboard" replace />;
@@ -32,8 +38,8 @@ function PublicOnlyRoute({ children }) {
 }
 
 export default function App() {
-  const { init } = useAuthStore();
-  useEffect(() => { init(); }, []);
+  const init = useAuthStore((s) => s.init);
+  useEffect(() => { init(); }, [init]);
 
   return (
     <LangProvider>
@@ -46,6 +52,7 @@ export default function App() {
             error:   { iconTheme: { primary: '#e8614a', secondary: '#fff' } },
           }}
         />
+        <Suspense fallback={<Loader />}>
         <Routes>
           <Route path="/"           element={<LandingPage />} />
           <Route path="/login"      element={<PublicOnlyRoute><LoginPage /></PublicOnlyRoute>} />
@@ -55,6 +62,7 @@ export default function App() {
           <Route path="/admin/*"    element={<PrivateRoute role="admin"><AdminDashboard /></PrivateRoute>} />
           <Route path="*"           element={<Navigate to="/" replace />} />
         </Routes>
+        </Suspense>
       </BrowserRouter>
     </LangProvider>
   );

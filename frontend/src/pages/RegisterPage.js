@@ -71,7 +71,7 @@ export default function RegisterPage() {
                 </div>
                 <div className="form-group">
                   <label className="form-label">{A.password}</label>
-                  <input className="form-input" type="password" required minLength={6} placeholder={A.passwordHint}
+                  <input className="form-input" type="password" required minLength={8} placeholder={A.passwordHint}
                     value={form.password} onChange={(e) => setForm({ ...form, password: e.target.value })} />
                 </div>
                 <div className="form-group">

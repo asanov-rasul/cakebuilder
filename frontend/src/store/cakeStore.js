@@ -42,6 +42,8 @@ const useCakeStore = create((set, get) => ({
     const { shape, size, filling, cream, decorations, shopConfig } = get();
     if (!shopConfig || !size) return 0;
 
+    // Preview only: the server recomputes the total with the same formula
+    // (backend/src/services/pricing.js) and rejects a mismatch.
     const basePrice = parseFloat(shopConfig.shop.price_per_kg_base) || 15;
     const sizeMultiplier = parseFloat(size.price_multiplier) || 1;
     let price = basePrice * parseFloat(size.weight_kg) * sizeMultiplier;
@@ -52,18 +54,6 @@ const useCakeStore = create((set, get) => ({
     decorations.forEach((d) => { price += parseFloat(d.price) || 0; });
 
     return Math.round(price * 100) / 100;
-  },
-
-  getCakeConfig: () => {
-    const { shape, size, filling, cream, decorations, cakeText } = get();
-    return {
-      shape: shape?.name,
-      size_kg: size?.weight_kg,
-      filling: filling?.name,
-      cream: cream?.name,
-      decorations: decorations.map((d) => d.name),
-      text: cakeText,
-    };
   },
 
   reset: () => set({

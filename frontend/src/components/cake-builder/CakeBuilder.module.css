@@ -75,3 +75,13 @@
 @media (max-width: 700px) {
   .viewerCol { position: static; }
 }
+
+/* Placeholder while the 3D viewer chunk loads (same size as the viewer). */
+.viewerFallback {
+  height: 340px;
+  border-radius: var(--radius-xl);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: radial-gradient(ellipse at 40% 30%, #fff8f0 0%, #fdf0e8 40%, #f5e6d8 100%);
+}

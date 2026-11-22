@@ -6,13 +6,12 @@ import { useLang } from '../../i18n';
 import styles from './OrderForm.module.css';
 
 export default function OrderForm({ shopId, shopName, onOrderPlaced, onBack }) {
-  const { shape, size, filling, cream, decorations, cakeText, calculatePrice, getCakeConfig } = useCakeStore();
-  const [form, setForm] = useState({ customer_name: '', customer_phone: '', delivery_date: '', delivery_time: '', comment: '' });
+  const { shape, size, filling, cream, decorations, cakeText, calculatePrice } = useCakeStore();
+  const [form, setForm] = useState({ customer_name: '', customer_phone: '', delivery_date: '', delivery_time: '', comment: '', website: '' });
   const [loading, setLoading] = useState(false);
   const { t } = useLang();
   const O = t.order;
   const price = calculatePrice();
-  const config = getCakeConfig();
 
   const tomorrow = new Date();
   tomorrow.setDate(tomorrow.getDate() + 1);
@@ -22,25 +21,32 @@ export default function OrderForm({ shopId, shopName, onOrderPlaced, onBack }) {
     e.preventDefault();
     setLoading(true);
     try {
+      // The server looks the options up by id and computes the total itself;
+      // total_price is sent only so it can tell us if prices changed.
       const res = await orderAPI.create({
         shop_id: shopId,
         customer_name: form.customer_name,
         customer_phone: form.customer_phone,
-        cake_shape: shape?.name,
-        cake_size_kg: size?.weight_kg,
-        cake_filling: filling?.name,
-        cake_cream: cream?.name,
-        cake_decorations: decorations.map(d => d.name),
+        shape_id: shape?.id ?? null,
+        size_id: size?.id ?? null,
+        filling_id: filling?.id ?? null,
+        cream_id: cream?.id ?? null,
+        decoration_ids: decorations.map(d => d.id),
         cake_text: cakeText,
-        cake_config: config,
         total_price: price,
         delivery_date: form.delivery_date || null,
         delivery_time: form.delivery_time || null,
         comment: form.comment || null,
+        website: form.website,
       });
       onOrderPlaced(res.data);
     } catch (err) {
-      toast.error(err.response?.data?.error || O.errorPlace);
+      const data = err.response?.data;
+      if (err.response?.status === 409 && data?.total_price !== undefined) {
+        toast.error(`${data.error}: ${Number(data.total_price).toFixed(2)} TMT`, { duration: 8000 });
+        return;
+      }
+      toast.error(data?.error || O.errorPlace);
     } finally {
       setLoading(false);
     }
@@ -74,6 +80,11 @@ export default function OrderForm({ shopId, shopName, onOrderPlaced, onBack }) {
       <div className={styles.formCard}>
         <h3 className={styles.formTitle}>{O.deliveryTitle}</h3>
         <form onSubmit={handleSubmit} className={styles.form}>
+          {/* Honeypot for bots: hidden from people and screen readers. */}
+          <input type="text" name="website" tabIndex={-1} autoComplete="off" aria-hidden="true"
+            style={{ position: 'absolute', left: '-10000px', width: 1, height: 1, opacity: 0 }}
+            value={form.website}
+            onChange={e => setForm({ ...form, website: e.target.value })} />
           <div className={styles.formRow}>
             <div className="form-group">
               <label className="form-label">{O.yourName}</label>

@@ -15,7 +15,9 @@ export default function ShopPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [orderComplete, setOrderComplete] = useState(null);
-  const { setShopConfig, reset, step } = useCakeStore();
+  const setShopConfig = useCakeStore((s) => s.setShopConfig);
+  const reset = useCakeStore((s) => s.reset);
+  const step = useCakeStore((s) => s.step);
   const { t } = useLang();
   const S = t.shop;
 

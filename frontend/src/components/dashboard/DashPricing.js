@@ -22,7 +22,7 @@ export default function DashPricing() {
     if (!basePrice || isNaN(basePrice)) return toast.error('Введите корректную цену');
     setSaving(true);
     try {
-      const res = await shopAPI.updateMy({ ...shop, price_per_kg_base: parseFloat(basePrice) });
+      const res = await shopAPI.updateMy({ price_per_kg_base: parseFloat(basePrice) });
       setShop(res.data);
       toast.success('Базовая цена сохранена!');
     } catch { toast.error('Не удалось сохранить'); }

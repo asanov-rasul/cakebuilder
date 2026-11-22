@@ -181,11 +181,16 @@ export default function DashOrders() {
     }
   }, [statusFilter, page]);
 
-  useEffect(() => { setPage(1); }, [statusFilter]);
+  // Changing the filter starts a new baseline, otherwise switching back to
+  // "All" looked like new orders had arrived.
+  useEffect(() => { setPage(1); prevCountRef.current = null; }, [statusFilter]);
   useEffect(() => { load(); }, [load]);
   useEffect(() => {
-    const interval = setInterval(() => load(true), 30000);
-    return () => clearInterval(interval);
+    // Poll only while the tab is visible; refresh as soon as it is shown again.
+    const interval = setInterval(() => { if (!document.hidden) load(true); }, 30000);
+    const onVisible = () => { if (!document.hidden) load(true); };
+    document.addEventListener('visibilitychange', onVisible);
+    return () => { clearInterval(interval); document.removeEventListener('visibilitychange', onVisible); };
   }, [load]);
 
   const handleStatusChange = (updated) => {

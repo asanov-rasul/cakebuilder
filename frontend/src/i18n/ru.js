@@ -83,7 +83,7 @@ const ru = {
     fullName: 'Ваше имя',
     phone: 'Телефон (необязательно)',
     continue: 'Продолжить →',
-    passwordHint: 'Минимум 6 символов',
+    passwordHint: 'Минимум 8 символов',
     bakeryName: 'Название пекарни',
     shopUrl: 'Ссылка на магазин',
     createShop: 'Создать магазин 🎉',
@@ -102,6 +102,13 @@ const ru = {
 
   // Конструктор торта
   builder: {
+    kg: 'кг',
+    presets: {
+      round: 'Круглый', square: 'Квадратный',
+      chocolate: 'Шоколад', vanilla: 'Ваниль', strawberry: 'Клубника', red_velvet: 'Красный бархат',
+      buttercream: 'Сливочный крем', chocolate_cream: 'Шоколадный крем', vanilla_cream: 'Ванильный крем',
+      fruits: 'Свежие фрукты', berries: 'Ягоды', chocolate_pieces: 'Шоколадные кусочки', figures: 'Фигурки',
+    },
     steps: ['Форма', 'Размер', 'Начинка', 'Крем', 'Украшения', 'Надпись'],
     yourCake: 'Ваш торт',
     optional: 'Необязательно',

@@ -79,7 +79,7 @@ const tk = {
     fullName: 'Adyňyz',
     phone: 'Telefon (hökmany däl)',
     continue: 'Dowam et →',
-    passwordHint: 'Azyndan 6 simwol',
+    passwordHint: 'Azyndan 8 simwol',
     bakeryName: 'Konditer dükanynyň ady',
     shopUrl: 'Dükan baglanyşygy',
     createShop: 'Dükan dör 🎉',
@@ -97,6 +97,13 @@ const tk = {
   },
 
   builder: {
+    kg: 'kg',
+    presets: {
+      round: 'Tegelek', square: 'Inedördül',
+      chocolate: 'Şokolad', vanilla: 'Wanil', strawberry: 'Ýertudana', red_velvet: 'Gyzyl barhat',
+      buttercream: 'Kaýmak krem', chocolate_cream: 'Şokolad krem', vanilla_cream: 'Wanil krem',
+      fruits: 'Täze miweler', berries: 'Ýabany miweler', chocolate_pieces: 'Şokolad bölejikleri', figures: 'Şekiller',
+    },
     steps: ['Görnüş', 'Ululyk', 'Doldurma', 'Krem', 'Bezeg', 'Ýazgy'],
     yourCake: 'Tortuňyz',
     optional: 'Hökmany däl',

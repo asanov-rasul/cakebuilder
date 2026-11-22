@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_BASE = process.env.REACT_APP_API_URL || 'http://localhost:5000';
+const API_BASE = import.meta.env.REACT_APP_API_URL || import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
 const api = axios.create({
   baseURL: `${API_BASE}/api`,
@@ -18,7 +18,10 @@ api.interceptors.request.use((config) => {
 api.interceptors.response.use(
   (res) => res,
   (err) => {
-    if (err.response?.status === 401) {
+    // A failed login is answered with 401 too; that must show the error on
+    // the login form, not reload the page.
+    const isLogin = err.config?.url?.includes('/auth/login');
+    if (err.response?.status === 401 && !isLogin) {
       localStorage.removeItem('cb_token');
       localStorage.removeItem('cb_user');
       window.location.href = '/login';

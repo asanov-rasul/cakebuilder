@@ -19,12 +19,18 @@ A full-stack SaaS platform for cake shops to accept custom cake orders online.
 ```
 cakebuilder/
 ├── backend/
+│   ├── migrations/           # Numbered SQL migrations (npm run migrate)
+│   ├── scripts/              # create-admin.js, seed-demo.js
 │   ├── src/
 │   │   ├── index.js          # Express server entry
-│   │   ├── db.js             # PostgreSQL pool
-│   │   ├── schema.sql        # Full DB schema + seed data
+│   │   ├── db.js             # PostgreSQL pool + withTransaction
+│   │   ├── migrate.js        # Migration runner
+│   │   ├── services/
+│   │   │   ├── pricing.js    # Server-side order pricing
+│   │   │   └── shops.js      # Default menu, shop open/closed rules
 │   │   ├── middleware/
-│   │   │   └── auth.js       # JWT auth + role guard
+│   │   │   ├── auth.js       # JWT auth + role guard
+│   │   │   └── rateLimit.js  # Login / register / order limits
 │   │   └── routes/
 │   │       ├── auth.js       # Register, login, /me
 │   │       ├── shops.js      # Shop config + menu CRUD
@@ -68,49 +74,79 @@ cakebuilder/
 
 ## Setup & Running
 
-### 1. Database
+### 1. Database + backend
 
 ```bash
-# Create database
 createdb cakebuilder
 
-# Run schema (creates tables + seeds demo data)
-psql cakebuilder < backend/src/schema.sql
-```
-
-### 2. Backend
-
-```bash
 cd backend
 npm install
 
 # Copy and configure env
 cp .env.example .env
-# Edit .env: set DATABASE_URL, JWT_SECRET
+# Edit .env: set DATABASE_URL, JWT_SECRET (long random string), CORS_ORIGINS
+
+# Create / upgrade the schema (SQL files in backend/migrations, each applied once)
+npm run migrate
+
+# Create the platform admin (password is never stored in the repo)
+ADMIN_EMAIL=you@example.com ADMIN_PASSWORD='a-long-password' npm run create-admin
+
+# Optional, local development only: demo shop at /shop/sweetcake
+npm run seed:demo
 
 npm run dev
 # Server runs on http://localhost:5000
 ```
 
-### 3. Frontend
+Schema changes go into a new numbered file in `backend/migrations/`
+(e.g. `003_add_indexes.sql`); never edit a migration that was already applied.
+
+**Production:** run `npm run migrate` on every deploy before starting the API.
+Set `TRUST_PROXY` to the number of proxies in front of the API (usually `1`)
+so rate limits see real client IPs.
+
+### 2. Frontend
 
 ```bash
 cd frontend
 npm install
-npm start
-# App runs on http://localhost:3000
+npm start          # Vite dev server on http://localhost:3000
+npm run build      # production build into frontend/build
 ```
+
+The API address comes from `REACT_APP_API_URL` (or `VITE_API_URL`) at build
+time; default `http://localhost:5000`. Requires Node 20.19+.
+
+### 3. Tests
+
+```bash
+cd backend && npm test     # API + migrations against a real PostgreSQL
+cd frontend && npm test    # pricing preview and menu presets
+```
+
+Backend tests start an embedded PostgreSQL automatically; set
+`TEST_DATABASE_URL` to use an existing server instead (CI does this).
+GitHub Actions (`.github/workflows/ci.yml`) runs both suites, `npm audit`
+and the frontend build on every push and pull request.
+
+### 4. Deploy notes
+
+- **API:** run `npm run migrate` before starting a new version; set
+  `JWT_SECRET`, `DATABASE_URL`, `CORS_ORIGINS`, `TRUST_PROXY`.
+- **Frontend (Vercel):** the project's Root Directory must be `frontend`.
+  `frontend/vercel.json` sets the Vite build, the SPA fallback and security
+  headers (CSP). If the API is on a fixed domain, narrow `connect-src` in the
+  CSP from `https:` to that domain.
 
 ---
 
-## Demo Credentials
+## Demo Data
 
-| Role | Email | Password |
-|------|-------|----------|
-| Admin | admin@cakebuilder.com | admin123 |
-| Shop Owner | owner@sweetcake.com | demo123 |
-
-Demo shop URL: **http://localhost:3000/shop/sweetcake**
+`npm run seed:demo` creates the owner `owner@sweetcake.com` and prints a
+generated password (or uses `DEMO_OWNER_PASSWORD`). Demo shop URL:
+**http://localhost:3000/shop/sweetcake**. The admin account is created with
+`npm run create-admin`; no default admin password exists.
 
 ---
 

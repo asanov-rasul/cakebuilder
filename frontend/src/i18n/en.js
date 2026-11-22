@@ -79,7 +79,7 @@ const en = {
     fullName: 'Your full name',
     phone: 'Phone (optional)',
     continue: 'Continue →',
-    passwordHint: 'At least 6 characters',
+    passwordHint: 'At least 8 characters',
     bakeryName: 'Bakery name',
     shopUrl: 'Your shop URL',
     createShop: 'Create my shop 🎉',
@@ -97,6 +97,13 @@ const en = {
   },
 
   builder: {
+    kg: 'kg',
+    presets: {
+      round: 'Round', square: 'Square',
+      chocolate: 'Chocolate', vanilla: 'Vanilla', strawberry: 'Strawberry', red_velvet: 'Red Velvet',
+      buttercream: 'Buttercream', chocolate_cream: 'Chocolate Cream', vanilla_cream: 'Vanilla Cream',
+      fruits: 'Fresh Fruits', berries: 'Berries', chocolate_pieces: 'Chocolate Pieces', figures: 'Figures',
+    },
     steps: ['Shape', 'Size', 'Filling', 'Cream', 'Decorations', 'Custom Text'],
     yourCake: 'Your cake',
     optional: 'Optional',

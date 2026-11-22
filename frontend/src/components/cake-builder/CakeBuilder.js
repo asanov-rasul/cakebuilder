@@ -1,25 +1,31 @@
-import React from 'react';
+import React, { Suspense, lazy } from 'react';
 import useCakeStore from '../../store/cakeStore';
-import StepShape from './StepShape';
-import StepSize from './StepSize';
-import StepFilling from './StepFilling';
-import StepCream from './StepCream';
-import StepDecorations from './StepDecorations';
-import StepText from './StepText';
-import Cake3DViewer from './Cake3DViewer';
+import { StepShape, StepSize, StepFilling, StepCream, StepDecorations, StepText } from './Steps';
 import { useLang } from '../../i18n';
 import styles from './CakeBuilder.module.css';
+
+// three.js is large; load it only when the builder is actually shown.
+const Cake3DViewer = lazy(() => import('./Cake3DViewer'));
 
 const STEP_EMOJIS = ['🔵', '⚖️', '🍫', '🧁', '🍓', '✍️'];
 const BUILDER_STEPS = 6;
 
 export default function CakeBuilder({ config }) {
-  const { step, nextStep, prevStep, goToStep, isStepComplete, calculatePrice } = useCakeStore();
+  // Narrow selectors: typing the cake text no longer re-renders the whole builder.
+  const step = useCakeStore((s) => s.step);
+  const nextStep = useCakeStore((s) => s.nextStep);
+  const prevStep = useCakeStore((s) => s.prevStep);
+  const goToStep = useCakeStore((s) => s.goToStep);
+  const stepComplete = useCakeStore((s) => s.isStepComplete(s.step));
+  const price = useCakeStore((s) => s.calculatePrice());
   const { t } = useLang();
   const B = t.builder;
 
-  const canNext = isStepComplete(step);
-  const price = calculatePrice();
+  // A step is only required when the shop offers options for it; the server
+  // applies the same rule (backend/src/services/pricing.js).
+  const STEP_OPTIONS = { 1: config.shapes, 2: config.sizes, 3: config.fillings, 4: config.creams };
+  const stepHasOptions = (STEP_OPTIONS[step] || []).length > 0;
+  const canNext = stepComplete || (step <= 4 && step !== 2 && !stepHasOptions);
   const isLastBuilderStep = step === BUILDER_STEPS;
 
   const renderStep = () => {
@@ -57,7 +63,9 @@ export default function CakeBuilder({ config }) {
 
       <div className={styles.mainLayout}>
         <div className={styles.viewerCol}>
-          <Cake3DViewer />
+          <Suspense fallback={<div className={styles.viewerFallback}><div className="spinner" /></div>}>
+            <Cake3DViewer />
+          </Suspense>
           <div className={styles.priceTag}>
             <span className={styles.priceTagLabel}>{B.yourCake}</span>
             <span className={styles.priceTagValue}>{price.toFixed(2)} TMT</span>
@@ -70,7 +78,7 @@ export default function CakeBuilder({ config }) {
               <h2 className={styles.stepTitle}>
                 {STEP_EMOJIS[step - 1]}&nbsp;{B.steps[step - 1]}
               </h2>
-              {step >= 4 && <span className={styles.optionalTag}>{B.optional}</span>}
+              {step >= 5 && <span className={styles.optionalTag}>{B.optional}</span>}
             </div>
             {renderStep()}
           </div>
@@ -82,7 +90,7 @@ export default function CakeBuilder({ config }) {
             <button
               className="btn btn-primary"
               onClick={nextStep}
-              disabled={step <= 2 && !canNext}
+              disabled={!canNext}
             >
               {isLastBuilderStep ? B.reviewOrder : B.continue}
             </button>

@@ -235,10 +235,9 @@ function MenuSection({ sectionKey, label, icon, addLabel, hasColor, items, onAdd
                       <ColorPicker
                         value={item.color || DEFAULT_COLORS[sectionKey]?.[item.name] || '#d09a60'}
                         onChange={async (color) => {
-                          try {
-                            await onEdit(sectionKey, item.id, { ...item, color });
-                            item.color = color; // optimistic update
-                          } catch (e) { console.error(e); }
+                          // onEdit replaces the item in state with the saved row.
+                          try { await onEdit(sectionKey, item.id, { color }); }
+                          catch { toast.error('Не удалось сохранить цвет'); }
                         }}
                       />
                     )}

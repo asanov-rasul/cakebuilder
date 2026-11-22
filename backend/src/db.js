@@ -6,15 +6,32 @@ const pool = new Pool({
   ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,
 });
 
-pool.on('connect', () => {
-  console.log('✅ Connected to PostgreSQL');
+pool.on('error', (err) => {
+  console.error('PostgreSQL pool error:', err.message);
 });
 
-pool.on('error', (err) => {
-  console.error('❌ PostgreSQL error:', err.message);
-});
+// Runs fn(client) inside BEGIN/COMMIT. Any throw - and any early return
+// path in fn - ends the transaction, so a client never goes back to the
+// pool with a transaction still open.
+async function withTransaction(fn) {
+  const client = await pool.connect();
+  let finished = false;
+  try {
+    await client.query('BEGIN');
+    const result = await fn(client);
+    await client.query('COMMIT');
+    finished = true;
+    return result;
+  } finally {
+    if (!finished) {
+      await client.query('ROLLBACK').catch(() => {});
+    }
+    client.release();
+  }
+}
 
 module.exports = {
   query: (text, params) => pool.query(text, params),
   pool,
+  withTransaction,
 };

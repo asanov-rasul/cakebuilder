@@ -1,6 +1,8 @@
 import React, { useEffect, useRef } from 'react';
 import * as THREE from 'three';
+import { shallow } from 'zustand/shallow';
 import useCakeStore from '../../store/cakeStore';
+import { useLang } from '../../i18n';
 import styles from './Cake3DViewer.module.css';
 
 /* ── Colour palettes ─────────────────────────────────────────────────────── */
@@ -260,7 +262,6 @@ function buildCake(scene, state) {
   const shapeName = (shape?.name || '').toLowerCase();
   const shapeSlug = (shape?.slug || '').toLowerCase();
   const sn = shapeSlug || shapeName || 'round';
-  console.log('[3D] shape slug:', shape?.slug, 'name:', shape?.name);
   const isSquare = shapeSlug === 'square' || shapeName.includes('квадр') || shapeName === 'square';
   const radius = isSquare ? 0.30 + kg * 0.055 : 0.33 + kg * 0.11;
   const layerH = 0.16 + kg * 0.024;
@@ -570,6 +571,20 @@ function buildPlate(scene, radius, isSquare) {
   rim.userData.isPlate = true; scene.add(rim);
 }
 
+/* ── Rebuild + cache animated objects ───────────────────────────────────────
+   Rebuilds the model and caches the objects the animation loop touches, so
+   the loop no longer walks the whole scene graph every frame.              */
+function rebuildScene(scene, state, animatedRef) {
+  const { radius, isSquare } = buildCake(scene, state);
+  buildPlate(scene, radius, isSquare);
+  const cake = [], flames = [];
+  scene.traverse((o) => {
+    if (o.userData.isFlame) flames.push(o);
+    if (o.userData.isCake && o.parent === scene) cake.push(o);
+  });
+  animatedRef.current = { cake, flames };
+}
+
 /* ── React component ─────────────────────────────────────────────────────── */
 export default function Cake3DViewer() {
   const canvasRef   = useRef(null);
@@ -582,12 +597,19 @@ export default function Cake3DViewer() {
   const targetRot   = useRef(0);
   const currentRot  = useRef(0);
 
-  const { shape, size, filling, cream, decorations, cakeText } = useCakeStore();
+  const animatedRef = useRef({ cake: [], flames: [] });
+  const visibleRef  = useRef(true);
+  const { t } = useLang();
+
+  // Only the selections the 3D model depends on (not the cake text).
+  const { shape, size, filling, cream, decorations } = useCakeStore(
+    (s) => ({ shape: s.shape, size: s.size, filling: s.filling, cream: s.cream, decorations: s.decorations }),
+    shallow
+  );
 
   useEffect(() => {
     if (!sceneRef.current) return;
-    const { radius, isSquare } = buildCake(sceneRef.current, { shape, size, filling, cream, decorations });
-    buildPlate(sceneRef.current, radius, isSquare);
+    rebuildScene(sceneRef.current, { shape, size, filling, cream, decorations }, animatedRef);
   }, [shape, size, filling, cream, decorations]);
 
   useEffect(() => {
@@ -626,8 +648,10 @@ export default function Cake3DViewer() {
     const fill = new THREE.PointLight(0xffe8cc, 0.28, 5);
     fill.position.set(0, -1.2, 0); scene.add(fill);
 
-    const { radius, isSquare } = buildCake(scene, { shape:null, size:null, filling:null, cream:null, decorations:[], cakeText:'' });
-    buildPlate(scene, radius, isSquare);
+    // Build from the current selections: when the viewer is re-mounted
+    // (e.g. after "Edit cake" on the order form) the preview must not reset.
+    const st = useCakeStore.getState();
+    rebuildScene(scene, { shape: st.shape, size: st.size, filling: st.filling, cream: st.cream, decorations: st.decorations }, animatedRef);
 
 
 
@@ -638,16 +662,15 @@ export default function Cake3DViewer() {
       currentRot.current += (targetRot.current - currentRot.current) * 0.055;
       if (!isDragging.current) targetRot.current += 0.004;
 
-      scene.traverse(obj => {
-        if (obj.userData.isFlame) {
-          obj.scale.x = 1 + Math.sin(t * 8.5 + obj.position.x * 12) * 0.13;
-          obj.scale.z = 1 + Math.cos(t * 7.2 + obj.position.z * 11) * 0.11;
-          obj.scale.y = 1 + Math.sin(t * 6.3) * 0.07;
-          if (obj.material) obj.material.emissiveIntensity = 0.75 + Math.sin(t * 10) * 0.18;
-        }
-        if (obj.userData.isCake && obj.parent === scene)
-          obj.rotation.y = currentRot.current;
-      });
+      if (!visibleRef.current) return; // off-screen: skip the work
+      const { cake, flames } = animatedRef.current;
+      for (const obj of flames) {
+        obj.scale.x = 1 + Math.sin(t * 8.5 + obj.position.x * 12) * 0.13;
+        obj.scale.z = 1 + Math.cos(t * 7.2 + obj.position.z * 11) * 0.11;
+        obj.scale.y = 1 + Math.sin(t * 6.3) * 0.07;
+        if (obj.material) obj.material.emissiveIntensity = 0.75 + Math.sin(t * 10) * 0.18;
+      }
+      for (const obj of cake) obj.rotation.y = currentRot.current;
 
       camera.position.y = 1.4 + Math.sin(t * 0.35) * 0.018;
       renderer.render(scene, camera);
@@ -661,6 +684,9 @@ export default function Cake3DViewer() {
       camera.aspect = w/h; camera.updateProjectionMatrix();
     });
     ro.observe(canvas);
+
+    const io = new IntersectionObserver(([entry]) => { visibleRef.current = entry.isIntersecting; });
+    io.observe(canvas);
 
     const onDown = e => { isDragging.current = true; lastX.current = e.clientX ?? e.touches?.[0]?.clientX; };
     const onMove = e => {
@@ -686,14 +712,23 @@ export default function Cake3DViewer() {
       canvas.removeEventListener('touchstart', onDown);
       canvas.removeEventListener('touchmove', onMove);
       canvas.removeEventListener('touchend', onUp);
+      io.disconnect();
+      // Free GPU memory held by the scene, then the WebGL context itself;
+      // otherwise repeated visits leak contexts until the browser refuses more.
+      scene.traverse((o) => {
+        o.geometry?.dispose();
+        (Array.isArray(o.material) ? o.material : [o.material]).forEach((m) => { m?.map?.dispose(); m?.dispose(); });
+      });
       renderer.dispose();
+      renderer.forceContextLoss();
+      sceneRef.current = null;
     };
   }, []);
 
   return (
     <div className={styles.viewer}>
       <canvas ref={canvasRef} className={styles.canvas} />
-      <div className={styles.hint}>Drag to rotate</div>
+      <div className={styles.hint}>{t.builder.dragRotate}</div>
     </div>
   );
 }

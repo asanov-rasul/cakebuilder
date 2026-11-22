@@ -1,27 +1,14 @@
 import React from 'react';
 import useCakeStore from '../../store/cakeStore';
+import { useLang } from '../../i18n';
+import { presetImage, itemLabel } from './menuPresets';
 import styles from './Steps.module.css';
-import cakeRoundImg from '../../assets/cake-round.png';
-import cakeSquareImg from '../../assets/cake-square.png';
 import cake1kg from '../../assets/cake-1kg.png';
 import cake2kg from '../../assets/cake-2kg.png';
 import cake3kg from '../../assets/cake-3kg.png';
-import fillingChocolate from '../../assets/chocolate-filling.png';
-import fillingRedVelvet from '../../assets/red-velvet-filling.png';
-import fillingStrawberry from '../../assets/strawberry-filling.png';
-import fillingVanilla from '../../assets/vanilla-filling.png';
-import creamVanilla from '../../assets/vanilla-cream.png';
-import creamChocolate from '../../assets/chocolate-cream.png';
-import creamButter from '../../assets/butter-cream.png';
-import decorBerries from '../../assets/berries-decor.png';
-import decorChocolate from '../../assets/chocolate-decor.png';
-import decorFruits from '../../assets/fruits-decor.png';
 
-// Русские названия по slug/name
-const SHAPE_NAMES   = { round: 'Круглый', circle: 'Круглый', square: 'Квадратный' };
-const FILLING_NAMES = { Chocolate: 'Шоколад', Vanilla: 'Ваниль', Strawberry: 'Клубника', 'Red Velvet': 'Красный бархат' };
-const CREAM_NAMES   = { Buttercream: 'Сливочный крем', 'Chocolate Cream': 'Шоколадный крем', 'Vanilla Cream': 'Ванильный крем' };
-const DECO_NAMES    = { 'Fresh Fruits': 'Свежие фрукты', Berries: 'Ягоды', 'Chocolate Pieces': 'Кусочки шоколада', 'Custom Figures': 'Фигурки' };
+const CURRENCY = 'TMT';
+const IMG_STYLE = { width: 50, height: 50, objectFit: 'contain' };
 
 function OptionCard({ emoji, label, sublabel, selected, onClick, badge }) {
   return (
@@ -29,6 +16,7 @@ function OptionCard({ emoji, label, sublabel, selected, onClick, badge }) {
       className={`${styles.optionCard} ${selected ? styles.selected : ''}`}
       onClick={onClick}
       type="button"
+      aria-pressed={selected}
     >
       {badge && <span className={styles.cardBadge}>{badge}</span>}
       <span className={styles.cardEmoji}>{emoji}</span>
@@ -39,58 +27,70 @@ function OptionCard({ emoji, label, sublabel, selected, onClick, badge }) {
   );
 }
 
-// Шаг 1: Форма — только круг и квадрат
-export function StepShape({ shapes }) {
-  const { shape, setShape } = useCakeStore();
-  const shapeEmojis = {
-  round: <img src={cakeRoundImg} alt="Круг" style={{ width: 50, height: 50, objectFit: 'contain' }} />,
-  square: <img src={cakeSquareImg} alt="Круг" style={{ width: 50, height: 50, objectFit: 'contain' }} />,
+const icon = (type, item, label, fallback) => {
+  const src = presetImage(type, item);
+  return src ? <img src={src} alt={label} style={IMG_STYLE} /> : fallback;
 };
-  const allowed = shapes.filter(s => s.slug === 'round' || s.slug === 'square');
-  
 
+const modifierLabel = (value, B) =>
+  parseFloat(value) > 0 ? `+${parseFloat(value).toFixed(2)} ${CURRENCY}` : B.included;
+
+// Shared single-choice step (shape, filling, cream).
+function SingleChoice({ type, items, value, onChange, fallback, grid }) {
+  const { t } = useLang();
+  const B = t.builder;
   return (
-    <div className={styles.grid3}>
-      {allowed.map((s) => (
-        <OptionCard
-          key={s.id}
-          emoji={shapeEmojis[s.slug] || '🔵'}
-          label={SHAPE_NAMES[s.slug] || s.name}
-          sublabel={parseFloat(s.price_modifier) > 0 ? `+${s.price_modifier} ТМТ` : 'Включено'}
-          selected={shape?.id === s.id}
-          onClick={() => setShape(s)}
-        />
-      ))}
+    <div className={grid}>
+      {items.map((item) => {
+        const label = itemLabel(type, item, B.presets);
+        return (
+          <OptionCard
+            key={item.id}
+            emoji={icon(type, item, label, fallback)}
+            label={label}
+            sublabel={modifierLabel(item.price_modifier, B)}
+            selected={value?.id === item.id}
+            onClick={() => onChange(item)}
+          />
+        );
+      })}
     </div>
   );
 }
 
-// Шаг 2: Размер
+// Step 1: shape. Every active shape the shop offers is shown; the 3D view
+// draws "square" shapes as square and everything else as round.
+export function StepShape({ shapes }) {
+  const shape = useCakeStore((s) => s.shape);
+  const setShape = useCakeStore((s) => s.setShape);
+  return <SingleChoice type="shapes" items={shapes} value={shape} onChange={setShape} fallback="🎂" grid={styles.grid3} />;
+}
+
+// Step 2: size
 export function StepSize({ sizes, pricePerKg }) {
-  const { size, setSize } = useCakeStore();
+  const size = useCakeStore((s) => s.size);
+  const setSize = useCakeStore((s) => s.setSize);
+  const { t } = useLang();
+  const B = t.builder;
   const base = parseFloat(pricePerKg) || 15;
 
   return (
     <div>
-      <p className={styles.stepHint}>Цена = базовая ставка × размер × форма</p>
+      <p className={styles.stepHint}>{B.sizeHint}</p>
       <div className={styles.grid3}>
         {sizes.map((s) => {
-          const price = (base * parseFloat(s.weight_kg) * parseFloat(s.price_multiplier)).toFixed(2);
+          const kg = parseFloat(s.weight_kg);
+          const price = (base * kg * (parseFloat(s.price_multiplier) || 1)).toFixed(2);
+          const img = kg <= 1 ? cake1kg : kg <= 2 ? cake2kg : cake3kg;
           return (
             <OptionCard
               key={s.id}
-              emoji={
-                s.weight_kg <= 1
-                  ? <img src={cake1kg} alt="1 кг" style={{ width: 50, height: 50, objectFit: 'contain' }} />
-                  : s.weight_kg <= 2
-                    ? <img src={cake2kg} alt="2 кг" style={{ width: 50, height: 50, objectFit: 'contain' }} />
-                    : <img src={cake3kg} alt="3 кг" style={{ width: 50, height: 50, objectFit: 'contain' }} />
-              }
-              label={`${s.weight_kg} кг`}
-              sublabel={`от ${price} ТМТ`}
+              emoji={<img src={img} alt={`${kg} ${B.kg}`} style={IMG_STYLE} />}
+              label={`${kg} ${B.kg}`}
+              sublabel={`${B.from} ${price} ${CURRENCY}`}
               selected={size?.id === s.id}
               onClick={() => setSize(s)}
-              badge={s.weight_kg === 2 ? 'Популярное' : null}
+              badge={kg === 2 ? B.popular : null}
             />
           );
         })}
@@ -99,79 +99,40 @@ export function StepSize({ sizes, pricePerKg }) {
   );
 }
 
-// Шаг 3: Начинка
+// Step 3: filling
 export function StepFilling({ fillings }) {
-  const { filling, setFilling } = useCakeStore();
-  const fillingEmojis = {
-    Шоколад: <img src={fillingChocolate} alt="Шоколад" style={{ width: 50, height: 50, objectFit: 'contain' }} />,
-    Ваниль: <img src={fillingVanilla} alt="Ваниль" style={{ width: 50, height: 50, objectFit: 'contain' }} />,
-    Клубника: <img src={fillingStrawberry} alt="Клубника" style={{ width: 50, height: 50, objectFit: 'contain' }} />,
-    'Красный бархат': <img src={fillingRedVelvet} alt="Красный бархат" style={{ width: 50, height: 50, objectFit: 'contain' }} />,
-  };
-
-  return (
-    <div className={styles.grid2}>
-      {fillings.map((f) => (
-        <OptionCard
-          key={f.id}
-          emoji={fillingEmojis[f.name] || '🎂'}
-          label={FILLING_NAMES[f.name] || f.name}
-          sublabel={parseFloat(f.price_modifier) > 0 ? `+${f.price_modifier} ТМТ` : 'Включено'}
-          selected={filling?.id === f.id}
-          onClick={() => setFilling(f)}
-        />
-      ))}
-    </div>
-  );
+  const filling = useCakeStore((s) => s.filling);
+  const setFilling = useCakeStore((s) => s.setFilling);
+  return <SingleChoice type="fillings" items={fillings} value={filling} onChange={setFilling} fallback="🎂" grid={styles.grid2} />;
 }
 
-// Шаг 4: Крем
+// Step 4: cream
 export function StepCream({ creams }) {
-  const { cream, setCream } = useCakeStore();
-  const creamEmojis = {
-    'Сливочный крем': <img src={creamButter} alt="Сливочный крем" style={{ width: 50, height: 50, objectFit: 'contain' }} />,
-    'Шоколадный крем': <img src={creamChocolate} alt="Шоколадный крем" style={{ width: 50, height: 50, objectFit: 'contain' }} />,
-    'Ванильный крем': <img src={creamVanilla} alt="Ванильный крем" style={{ width: 50, height: 50, objectFit: 'contain' }} />,
-  };
-
-  return (
-    <div className={styles.grid2}>
-      {creams.map((c) => (
-        <OptionCard
-          key={c.id}
-          emoji={creamEmojis[c.name] || '🧁'}
-          label={CREAM_NAMES[c.name] || c.name}
-          sublabel={parseFloat(c.price_modifier) > 0 ? `+${c.price_modifier} ТМТ` : 'Включено'}
-          selected={cream?.id === c.id}
-          onClick={() => setCream(c)}
-        />
-      ))}
-    </div>
-  );
+  const cream = useCakeStore((s) => s.cream);
+  const setCream = useCakeStore((s) => s.setCream);
+  return <SingleChoice type="creams" items={creams} value={cream} onChange={setCream} fallback="🧁" grid={styles.grid2} />;
 }
 
-// Шаг 5: Украшения
+// Step 5: decorations (multiple choice, optional)
 export function StepDecorations({ decorations }) {
-  const { decorations: selected, toggleDecoration } = useCakeStore();
-  const decorEmojis = {
-    'Свежие фрукты': <img src={decorFruits} alt="Свежие фрукты" style={{ width: 50, height: 50, objectFit: 'contain' }} />,
-    'Ягоды': <img src={decorBerries} alt="Ягоды" style={{ width: 50, height: 50, objectFit: 'contain' }} />,
-    'Шоколадные кусочки': <img src={decorChocolate} alt="Шоколадные кусочки" style={{ width: 50, height: 50, objectFit: 'contain' }} />,
-  };
+  const selected = useCakeStore((s) => s.decorations);
+  const toggleDecoration = useCakeStore((s) => s.toggleDecoration);
+  const { t } = useLang();
+  const B = t.builder;
 
   return (
     <div>
-      <p className={styles.stepHint}>Выберите несколько или пропустите этот шаг</p>
+      <p className={styles.stepHint}>{B.decorHint}</p>
       <div className={styles.grid2}>
         {decorations.map((d) => {
-          const isSelected = selected.some((s) => s.id === d.id);
+          const label = itemLabel('decorations', d, B.presets);
           return (
             <OptionCard
               key={d.id}
-              emoji={decorEmojis[d.name] || '✨'}
-              label={DECO_NAMES[d.name] || d.name}
-              sublabel={`+${parseFloat(d.price).toFixed(2)} ТМТ`}
-              selected={isSelected}
+              emoji={icon('decorations', d, label, '✨')}
+              label={label}
+              sublabel={`+${parseFloat(d.price).toFixed(2)} ${CURRENCY}`}
+              selected={selected.some((s) => s.id === d.id)}
               onClick={() => toggleDecoration(d)}
             />
           );
@@ -181,24 +142,28 @@ export function StepDecorations({ decorations }) {
   );
 }
 
-// Шаг 6: Надпись
+// Step 6: text on the cake (optional)
 export function StepText() {
-  const { cakeText, setCakeText } = useCakeStore();
+  const cakeText = useCakeStore((s) => s.cakeText);
+  const setCakeText = useCakeStore((s) => s.setCakeText);
+  const { t } = useLang();
+  const B = t.builder;
 
   return (
     <div className={styles.textStep}>
-      <p className={styles.stepHint}>Добавьте надпись на торт — или оставьте пустым</p>
+      <p className={styles.stepHint}>{B.textHint}</p>
       <div className={styles.textPreview}>
         <div className={styles.cakePreviewBg}>🎂</div>
         {cakeText && <div className={styles.cakeTextOverlay}>"{cakeText}"</div>}
       </div>
       <div className="form-group mt-4">
-        <label className="form-label">Надпись на торте</label>
+        <label className="form-label" htmlFor="cake-text">{B.textLabel}</label>
         <input
+          id="cake-text"
           className="form-input"
           type="text"
           maxLength={40}
-          placeholder='Например: "С Днём Рождения! 🎉"'
+          placeholder={B.textPlaceholder}
           value={cakeText}
           onChange={(e) => setCakeText(e.target.value)}
         />
@@ -207,5 +172,3 @@ export function StepText() {
     </div>
   );
 }
-
-export default { StepShape, StepSize, StepFilling, StepCream, StepDecorations, StepText };
